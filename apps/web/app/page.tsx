@@ -14,9 +14,9 @@ export default function Home() {
                     <h1 className="text-xl text-[#fff]">Make money doing what you love</h1>
                     <span className="mt-4 text-sm">
                         tip.dev ({"{$}"}) is a platform for{" "}
-                        <span className="glowing font-bold text-[#fff]">developers</span> to get
-                        paid by fans of their work. Embed a link anywhere and get paid from almost
-                        everywhere.
+                        <span className="font-extrabold text-[#fff] underline">developers</span> to
+                        get paid by fans of their work. Embed a link anywhere and get paid from
+                        almost everywhere.
                     </span>
                 </div>
 

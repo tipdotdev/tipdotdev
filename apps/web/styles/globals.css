@@ -78,10 +78,3 @@ body {
         @apply bg-background text-foreground;
     }
 }
-
-.glowing {
-    color: #fff; /* White text color */
-    text-shadow:
-        0 0 2px #fff,
-        /* Inner glow */ 0 0 4px rgba(255, 255, 255, 0.5); /* Outer glow with reduced opacity */
-}
