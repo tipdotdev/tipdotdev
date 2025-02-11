@@ -1,46 +1,30 @@
-import FeaturesGrid from "@/components/features-grid";
-import Footer from "@/components/footer";
-import Navbar from "@/components/navbar";
-import { Badge } from "@/components/ui/badge";
-import { Particles } from "@/components/ui/particles";
+"use client";
+
+import { TUIBadge } from "@/components/tui/tui-badge";
+import TUINavbar from "@/components/tui/tui-navbar";
 
 export default function Home() {
-    const comingSoon = true;
-
     return (
-        <div className="flex min-h-screen flex-col">
-            <Navbar comingSoon={comingSoon} />
-
+        <div className="flex min-h-screen flex-col font-mono font-normal text-[#d7d7d7]">
+            <TUINavbar active="home" />
             {/* Full-height Hero Section */}
-            <section className="relative flex h-screen items-center justify-center">
-                <div className="z-10 flex flex-col items-center justify-center gap-4 px-4 text-center">
-                    {comingSoon && (
-                        <Badge className="mb-8 bg-purple-500/20 font-mono text-purple-300 hover:bg-purple-500/20">
-                            Coming Soon
-                        </Badge>
-                    )}
-                    <h1 className="font-serif text-3xl font-extrabold sm:text-5xl">
-                        Make money doing what you love
-                    </h1>
-                    <p className="max-w-xl font-serif text-sm text-muted-foreground sm:text-lg">
-                        tip.dev is a platform for <span className="text-primary">developers</span>{" "}
-                        to get paid by fans of their work. Embed a link anywhere and get paid from
-                        almost everywhere.
-                    </p>
+            <section className="relative flex h-screen flex-col items-center justify-center px-12 py-8">
+                <div className="flex max-w-md flex-col gap-2">
+                    <p className="text-sm text-[#AAA]">tip.dev</p>
+                    <h1 className="text-xl text-[#fff]">Make money doing what you love</h1>
+                    <span className="mt-4 text-sm">
+                        tip.dev ({"{$}"}) is a platform for{" "}
+                        <span className="glowing font-bold text-[#fff]">developers</span> to get
+                        paid by fans of their work. Embed a link anywhere and get paid from almost
+                        everywhere.
+                    </span>
                 </div>
-                <Particles
-                    className="absolute inset-0"
-                    quantity={500}
-                    ease={80}
-                    color={"#ffffff"}
-                    refresh
-                />
+
+                <div className="mt-8 flex w-full max-w-md items-start gap-2">
+                    {/* <ASCIIButton text="Get Started" onClick={() => console.log("Clicked")} /> */}
+                    <TUIBadge text="Coming Soon" />
+                </div>
             </section>
-
-            {/* Animated Features Section */}
-            <FeaturesGrid />
-
-            <Footer />
         </div>
     );
 }

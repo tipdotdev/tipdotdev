@@ -15,50 +15,58 @@ body {
 
 @layer base {
     :root {
-        /* Base backgrounds */
-        --background: 231 15% 18%; /* #282a36 Dracula background */
-        --foreground: 60 30% 96%; /* #f8f8f2 Dracula foreground */
-
-        /* Cards and popovers */
-        --card: 232 14% 31%; /* #44475a Dracula current line */
-        --card-foreground: 60 30% 96%; /* #f8f8f2 Dracula foreground */
-        --popover: 232 14% 31%; /* #44475a Dracula current line */
-        --popover-foreground: 60 30% 96%; /* #f8f8f2 Dracula foreground */
-
-        /* Primary colors */
-        --primary: 326 100% 74%; /* #ff79c6 Dracula pink */
-        --primary-foreground: 231 15% 18%; /* #282a36 Dracula background */
-
-        /* Secondary colors */
-        --secondary: 265 89% 78%; /* #bd93f9 Dracula purple */
-        --secondary-foreground: 60 30% 96%; /* #f8f8f2 Dracula foreground */
-
-        /* Muted elements */
-        --muted: 232 14% 31%; /* #44475a Dracula current line */
-        --muted-foreground: 231 15% 65%; /* Dracula comment color */
-
-        /* Accent colors */
-        --accent: 231 15% 25%; /* Slightly lighter than background */
-        --accent-foreground: 60 30% 96%; /* #f8f8f2 Dracula foreground */
-
-        /* Destructive actions */
-        --destructive: 0 100% 67%; /* #ff5555 Dracula red */
-        --destructive-foreground: 60 30% 96%; /* #f8f8f2 Dracula foreground */
-
-        /* Borders and inputs */
-        --border: 232 14% 31%; /* #44475a Dracula current line */
-        --input: 232 14% 31%; /* #44475a Dracula current line */
-        --ring: 326 100% 74%; /* #ff79c6 Dracula pink */
-
-        /* Chart colors */
-        --chart-1: 326 100% 74%; /* #ff79c6 Dracula pink */
-        --chart-2: 135 94% 65%; /* #50fa7b Dracula green */
-        --chart-3: 265 89% 78%; /* #bd93f9 Dracula purple */
-        --chart-4: 31 100% 71%; /* #ffb86c Dracula orange */
-        --chart-5: 191 97% 77%; /* #8be9fd Dracula cyan */
-
+        --background: 0 0% 7%;
+        --foreground: 0 0% 98%;
+        --card: 240 10% 3.9%;
+        --card-foreground: 0 0% 98%;
+        --popover: 240 10% 3.9%;
+        --popover-foreground: 0 0% 98%;
+        --primary: 0 0% 98%;
+        --primary-foreground: 240 5.9% 10%;
+        --secondary: 240 3.7% 15.9%;
+        --secondary-foreground: 0 0% 98%;
+        --muted: 240 3.7% 15.9%;
+        --muted-foreground: 240 5% 64.9%;
+        --accent: 240 3.7% 15.9%;
+        --accent-foreground: 0 0% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 3.7% 15.9%;
+        --input: 240 3.7% 15.9%;
+        --ring: 240 4.9% 83.9%;
+        --chart-1: 220 70% 50%;
+        --chart-2: 160 60% 45%;
+        --chart-3: 30 80% 55%;
+        --chart-4: 280 65% 60%;
+        --chart-5: 340 75% 55%;
         /* Border radius */
-        --radius: 0.75rem;
+        --radius: 0.5rem;
+    }
+    .dark {
+        --background: 240 10% 3.9%;
+        --foreground: 0 0% 98%;
+        --card: 240 10% 3.9%;
+        --card-foreground: 0 0% 98%;
+        --popover: 240 10% 3.9%;
+        --popover-foreground: 0 0% 98%;
+        --primary: 0 0% 98%;
+        --primary-foreground: 240 5.9% 10%;
+        --secondary: 240 3.7% 15.9%;
+        --secondary-foreground: 0 0% 98%;
+        --muted: 240 3.7% 15.9%;
+        --muted-foreground: 240 5% 64.9%;
+        --accent: 240 3.7% 15.9%;
+        --accent-foreground: 0 0% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 3.7% 15.9%;
+        --input: 240 3.7% 15.9%;
+        --ring: 240 4.9% 83.9%;
+        --chart-1: 220 70% 50%;
+        --chart-2: 160 60% 45%;
+        --chart-3: 30 80% 55%;
+        --chart-4: 280 65% 60%;
+        --chart-5: 340 75% 55%;
     }
 }
 
@@ -69,4 +77,11 @@ body {
     body {
         @apply bg-background text-foreground;
     }
+}
+
+.glowing {
+    color: #fff; /* White text color */
+    text-shadow:
+        0 0 2px #fff,
+        /* Inner glow */ 0 0 4px rgba(255, 255, 255, 0.5); /* Outer glow with reduced opacity */
 }
