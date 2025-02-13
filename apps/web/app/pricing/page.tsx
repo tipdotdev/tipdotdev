@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils";
 
 export default function Page() {
     return (
-        <div className="flex min-h-screen flex-col items-center font-mono font-normal">
+        <div className="flex min-h-screen flex-col items-center justify-center font-mono font-normal">
             <TUINavbar active="pricing" />
-            <section className="relative flex h-screen w-full max-w-4xl flex-col items-center justify-center px-12 py-8">
+            <section className="relative mt-12 flex w-full max-w-4xl flex-col items-center justify-center px-4 py-8">
                 <div className="flex w-full flex-col gap-2">
                     <h1 className="text-xl text-[#fff]">tip.dev is free, for everyone, forever.</h1>
                     <p className="mt-2 text-sm">
@@ -27,7 +27,7 @@ export default function Page() {
 
                 <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
                     <FeatureCard
-                        className="col-span-2"
+                        className="md:col-span-2"
                         title="Flat 4.5% Fee"
                         description="You never have to guess how much you’ll make. We take a flat 4.5% fee on each transaction, so you can focus on creating and connecting."
                     />

@@ -8,7 +8,7 @@ export default function Home() {
         <div className="flex min-h-screen flex-col font-mono font-normal">
             <TUINavbar active="home" />
             {/* Full-height Hero Section */}
-            <section className="relative flex h-screen flex-col items-center justify-center px-12 py-8">
+            <section className="relative flex h-screen flex-col items-center justify-center px-4 py-8">
                 <div className="flex max-w-md flex-col gap-2">
                     <p className="text-sm text-[#AAA]">tip.dev</p>
                     <h1 className="text-xl text-[#fff]">Make money doing what you love</h1>
