@@ -5,7 +5,7 @@ import TUINavbar from "@/components/tui/tui-navbar";
 
 export default function Home() {
     return (
-        <div className="flex min-h-screen flex-col font-mono font-normal text-[#d7d7d7]">
+        <div className="flex min-h-screen flex-col font-mono font-normal">
             <TUINavbar active="home" />
             {/* Full-height Hero Section */}
             <section className="relative flex h-screen flex-col items-center justify-center px-12 py-8">

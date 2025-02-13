@@ -2,7 +2,7 @@ import TUINavbar from "@/components/tui/tui-navbar";
 
 export default function Page() {
     return (
-        <div className="flex min-h-screen flex-col font-mono font-normal text-[#d7d7d7]">
+        <div className="flex min-h-screen flex-col font-mono font-normal">
             <TUINavbar active={undefined} />
             <section className="relative flex h-screen flex-col items-center justify-center px-12 py-8">
                 <div className="flex max-w-md flex-col gap-2">
