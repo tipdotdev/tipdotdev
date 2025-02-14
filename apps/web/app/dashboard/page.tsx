@@ -19,19 +19,13 @@ export default async function Page() {
         <div className="flex min-h-screen flex-col items-center justify-center font-normal">
             <section className="relative mt-1 flex w-full max-w-lg flex-col items-start justify-center px-4 py-8">
                 <h1>User data:</h1>
-                <p>
-                    ID: <span className="ml-[5.35rem] font-mono">{user.id}</span>
-                </p>
-                <p>
-                    Username:{" "}
-                    <span className="ml-[1.72rem] font-mono">{profile.data.username}</span>
-                </p>
-                <p>
-                    Email: <span className="ml-16 font-mono">{user.email}</span>
-                </p>
-                <p>
-                    Created at: <span className="ml-[1.75rem] font-mono">{user.created_at}</span>
-                </p>
+
+                <DataItem label="ID" value={user.id} />
+                <DataItem label="Username" value={profile.data.username} />
+                <DataItem label="Email" value={user.email || "undefined"} />
+                <DataItem label="Created at" value={user.created_at} />
+                <DataItem label="Updated at" value={user.updated_at || "undefined"} />
+
                 <Link
                     href="/auth/sign-out"
                     className="mt-4 underline transition-colors hover:text-white"
@@ -39,6 +33,15 @@ export default async function Page() {
                     Sign out
                 </Link>
             </section>
+        </div>
+    );
+}
+
+function DataItem({ label, value }: { label: string; value: string }) {
+    return (
+        <div className="flex w-full items-center justify-between">
+            <p>{label}:</p>
+            <p className="font-mono">{value}</p>
         </div>
     );
 }
