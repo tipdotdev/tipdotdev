@@ -3,13 +3,11 @@ import { TrendingDown, TrendingUp } from "lucide-react";
 export default function PercentChange({
     value,
     positive = false,
-    showText = false,
-    className
+    showText = false
 }: {
     value: number;
     positive?: boolean;
     showText?: boolean;
-    className?: string;
 }) {
     if (positive) {
         return (
