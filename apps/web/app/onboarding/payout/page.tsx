@@ -1,5 +1,6 @@
 "use client";
 
+import { getSelfProfile } from "@/app/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -9,6 +10,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export default function Page() {
+    getSelfProfile().then((profile) => {
+        if (profile?.stripe_account_id) {
+            window.location.href = "/dashboard";
+        }
+    });
+
     const [loading, setLoading] = useState(false);
 
     const handleClick = () => {

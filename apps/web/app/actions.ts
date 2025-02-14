@@ -92,3 +92,24 @@ export async function insertUsername(username: string) {
         throw new Error("Error setting username");
     }
 }
+
+export async function getSelfProfile() {
+    const supabase = await createServerClient();
+    const userData = await supabase.auth.getUser();
+    if (!userData || userData.error) {
+        return null;
+    }
+
+    const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userData.data?.user.id)
+        .single();
+
+    if (error) {
+        console.error("Error getting self profile:", error);
+        return null;
+    }
+
+    return data;
+}
