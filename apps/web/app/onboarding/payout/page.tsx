@@ -60,7 +60,7 @@ export default function Page() {
                         </p>
 
                         <Button className="mt-6 w-full" disabled={loading} onClick={handleClick}>
-                            {loading ? <Spinner className="h-4 w-4" /> : <LockIcon />}
+                            {loading ? <Spinner size={16} /> : <LockIcon />}
                             Connect with Stripe
                         </Button>
                     </div>
