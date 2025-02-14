@@ -11,7 +11,7 @@ export default function Page() {
             {/* Full-height Hero Section */}
             <section className="relative flex h-screen flex-col items-center justify-center px-4 py-8">
                 <div className="flex w-full max-w-md flex-col gap-2">
-                    <h2 className="text-xl text-[#fff]">Who are you?</h2>
+                    <h2 className="text-xl text-white">Who are you?</h2>
                     <p className="text-xs">
                         Sign in to your account to access your dashboard. If you don&apos;t have an
                         account, don&apos;t worry—we will get you set up.
