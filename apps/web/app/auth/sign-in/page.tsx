@@ -8,7 +8,6 @@ export default function Page() {
     return (
         <div className="flex min-h-screen flex-col font-mono font-normal">
             <TUINavbar active="sign-in" />
-            {/* Full-height Hero Section */}
             <section className="relative flex h-screen flex-col items-center justify-center px-4 py-8">
                 <div className="flex w-full max-w-md flex-col gap-2">
                     <h2 className="text-xl text-white">Who are you?</h2>
