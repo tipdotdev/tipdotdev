@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 export default function DashboardGrid({ children }: { children: React.ReactNode }) {
-    return <div className="mt-4 grid w-full grid-cols-2 gap-4 md:grid-cols-4">{children}</div>;
+    return <div className="mt-4 grid w-full grid-cols-2 gap-2 md:grid-cols-4">{children}</div>;
 }
 
 export function DashboardGridItem({

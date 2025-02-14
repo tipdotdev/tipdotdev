@@ -1,9 +1,23 @@
+import AccountDropdown from "@/components/dashboard/account-dropdown";
 import DashboardGrid, { DashboardGridItem } from "@/components/dashboard/grid";
 import { WelcomeBack } from "@/components/dashboard/home";
+import PercentChange from "@/components/dashboard/percent-change";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList
+} from "@/components/ui/breadcrumb";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { createServerClient } from "@/utils/supabase/server";
-import { CircleIcon } from "lucide-react";
-import Image from "next/image";
+import { SquareIcon } from "lucide-react";
 import { getSelfProfile } from "../actions";
 
 export default async function Page() {
@@ -26,28 +40,79 @@ export default async function Page() {
                         <SidebarTrigger className="flex md:hidden" />
                         <h1 className="text-3xl font-bold">Home</h1>
                     </div>
-                    <Image
-                        src={profile.avatar_url}
-                        alt={"Profile picture"}
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                    />
+                    <AccountDropdown profile={profile} />
                 </div>
-                <div className="mt-2 flex items-center justify-start font-mono text-xs">
-                    <CircleIcon className="mr-2 size-3 fill-green-400 text-green-400" />
-                    <p>
-                        Your page is live at{" "}
-                        <span className="cursor-pointer hover:underline">
-                            <a href={`https://tip.dev/${profile.username}`} target="_blank">
-                                tip.dev/{profile.username}
-                            </a>
-                        </span>
-                    </p>
-                </div>
+                <Breadcrumb className="font-mono text-xs">
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
                 <DashboardGrid>
                     <DashboardGridItem className="col-span-4">
                         <WelcomeBack profile={profile} user={user} />
+                    </DashboardGridItem>
+
+                    <DashboardGridItem className="col-span-4 md:col-span-2">
+                        <div className="flex w-full flex-row items-start justify-between">
+                            <h3 className="text-lg font-bold">Income</h3>
+                            <Select>
+                                <SelectTrigger className="w-36">
+                                    <SelectValue placeholder="All-time" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="All-time">All-time</SelectItem>
+                                    <SelectItem value="Today">Today</SelectItem>
+                                    <SelectItem value="Past-7-days">Past 7 Days</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="mt-2 flex items-center justify-start gap-4">
+                            <p className="text-4xl font-extrabold">$5,383.29</p>
+                            <PercentChange value={12.5} positive showText />
+                        </div>
+
+                        <div className="mt-4 flex w-full flex-row items-center gap-4">
+                            <div className="flex flex-row items-center justify-center gap-1">
+                                <SquareIcon className="size-3 fill-green-400 text-green-400" />
+                                <p className="font-mono text-xs text-foreground/60">$3.4k Tips</p>
+                            </div>
+                            <div className="flex flex-row items-center justify-center gap-1">
+                                <SquareIcon className="size-3 fill-blue-400 text-blue-400" />
+                                <p className="font-mono text-xs text-foreground/60">$1.9k Subs</p>
+                            </div>
+                        </div>
+                    </DashboardGridItem>
+                    <DashboardGridItem className="col-span-4 md:col-span-2">
+                        <div className="flex w-full flex-row items-start justify-between">
+                            <h3 className="text-lg font-bold">Supporters</h3>
+                            <Select>
+                                <SelectTrigger className="w-36">
+                                    <SelectValue placeholder="All-time" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="All-time">All-time</SelectItem>
+                                    <SelectItem value="Today">Today</SelectItem>
+                                    <SelectItem value="Past-7-days">Past 7 Days</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="mt-2 flex items-center justify-start gap-4">
+                            <p className="text-4xl font-extrabold">240</p>
+                            <PercentChange value={100} positive showText />
+                        </div>
+
+                        <div className="mt-4 flex w-full flex-row items-center gap-4">
+                            <div className="flex flex-row items-center justify-center gap-1">
+                                <SquareIcon className="size-3 fill-green-400 text-green-400" />
+                                <p className="font-mono text-xs text-foreground/60">219 Tips</p>
+                            </div>
+                            <div className="flex flex-row items-center justify-center gap-1">
+                                <SquareIcon className="size-3 fill-blue-400 text-blue-400" />
+                                <p className="font-mono text-xs text-foreground/60">21 Subs</p>
+                            </div>
+                        </div>
                     </DashboardGridItem>
                 </DashboardGrid>
             </section>
