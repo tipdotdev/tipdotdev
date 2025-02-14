@@ -7,7 +7,6 @@ export async function GET(request: Request) {
     // https://supabase.com/docs/guides/auth/server-side/nextjs
     const requestUrl = new URL(request.url);
     const code = requestUrl.searchParams.get("code");
-    const origin = requestUrl.origin;
     const redirectTo = requestUrl.searchParams.get("redirect_to")?.toString();
 
     if (code) {
@@ -16,7 +15,7 @@ export async function GET(request: Request) {
         const { data, error } = await supabase.auth.getUser();
         if (error) {
             console.error("Error getting user:", error);
-            return NextResponse.redirect(`${origin}/auth/sign-in`);
+            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/sign-in`);
         }
 
         // if the user was created in teh last 30 seconds, redirect to the onboarding page
@@ -25,14 +24,14 @@ export async function GET(request: Request) {
         const diff = Math.abs(now.getTime() - createdAt.getTime());
         const diffSeconds = Math.floor(diff / 1000);
         if (diffSeconds < 30) {
-            return NextResponse.redirect(`${origin}/onboarding/username`);
+            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/onboarding/username`);
         }
     }
 
     if (redirectTo) {
-        return NextResponse.redirect(`${origin}${redirectTo}`);
+        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}${redirectTo}`);
     }
 
     // URL to redirect to after sign up process completes
-    return NextResponse.redirect(`${origin}/dashboard`);
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`);
 }
