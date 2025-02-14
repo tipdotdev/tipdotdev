@@ -2,6 +2,7 @@ import TUINavbar from "@/components/tui/tui-navbar";
 import { Button } from "@/components/ui/button";
 import GitHubLogo from "@/public/images/svg/github.svg";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Page() {
     return (
@@ -31,6 +32,17 @@ export default function Page() {
                             Continue with Google
                         </Button>
                     </div>
+
+                    <p className="mt-4 text-start text-xs text-foreground/40">
+                        By continuing you agree to our{" "}
+                        <Link href="/terms" className="text-foreground hover:underline">
+                            Terms of Service
+                        </Link>{" "}
+                        and{" "}
+                        <Link href="/privacy" className="text-foreground hover:underline">
+                            Privacy Policy
+                        </Link>
+                    </p>
                 </div>
             </section>
         </div>
