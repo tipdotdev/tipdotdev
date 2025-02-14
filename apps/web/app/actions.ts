@@ -8,19 +8,19 @@ interface OAuthData {
     url: string;
 }
 
-export async function signInWithGitHubAction(): Promise<OAuthData | null> {
+export async function signInWithOAuth(provider: "google" | "github"): Promise<OAuthData | null> {
     const supabase = await createServerClient();
     const origin = (await headers()).get("origin");
 
     const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "github",
+        provider,
         options: {
             redirectTo: `${origin}/auth/callback`
         }
     });
 
     if (error) {
-        console.error("Error signing in with GitHub:", error);
+        console.error("Error signing in with OAuth", error);
         return null;
     }
 
