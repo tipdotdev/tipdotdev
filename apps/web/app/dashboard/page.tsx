@@ -51,7 +51,7 @@ export default async function Page() {
 function DataItem({ label, value }: { label: string; value: string }) {
     return (
         <div className="flex w-full items-center justify-between">
-            <p>{label}:</p>
+            <p className="text-foreground/40">{label}:</p>
             <p className="font-mono">{value}</p>
         </div>
     );
