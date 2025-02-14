@@ -17,7 +17,7 @@ export default function TUINavbar({
                 "0": "/",
                 "1": "/about",
                 "2": "/pricing",
-                "3": "/sign-in"
+                "3": "/auth/sign-in"
             };
 
             if (keyToLinkMap[e.key] !== undefined) {
@@ -40,7 +40,7 @@ export default function TUINavbar({
                 <TUILink href="/about" text="[1] about" isActive={active === "about"} />
                 <TUILink href="/pricing" text="[2] pricing" isActive={active === "pricing"} />
             </div>
-            <TUILink href="/sign-in" text="[3] sign in" isActive={active === "sign-in"} />
+            <TUILink href="/auth/sign-in" text="[3] sign in" isActive={active === "sign-in"} />
         </nav>
     );
 }
