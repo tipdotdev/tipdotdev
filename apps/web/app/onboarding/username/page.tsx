@@ -1,6 +1,6 @@
 "use client";
 
-import { checkUsernameAvailability, getSelfProfile, insertUsername } from "@/app/actions";
+import { checkUsernameAvailability, insertUsername } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -27,12 +27,6 @@ const formSchema = z.object({
 });
 
 export default function Page() {
-    getSelfProfile().then((profile) => {
-        if (profile?.username) {
-            window.location.href = "/onboarding/payout";
-        }
-    });
-
     const [usernameAvailable, setUsernameAvailable] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
