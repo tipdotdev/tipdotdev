@@ -7,6 +7,7 @@ import {
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
+    SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
@@ -45,6 +46,9 @@ const items = [
 export function Sidebar() {
     return (
         <Sb collapsible="icon" variant="floating">
+            <SidebarHeader>
+                <p className="text-md font-mono">{"{$}"}</p>
+            </SidebarHeader>
             <SidebarContent className="border-0">
                 <SidebarGroup>
                     <SidebarGroupLabel>Application</SidebarGroupLabel>

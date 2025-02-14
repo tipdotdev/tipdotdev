@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
         remotePatterns: [
             {
                 protocol: "https",
-                hostname: "media.themoviedb.org"
+                hostname: "auth.tip.dev"
             }
         ]
     },
