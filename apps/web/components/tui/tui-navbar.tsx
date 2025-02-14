@@ -35,12 +35,13 @@ export default function TUINavbar({
     return (
         <nav className="absolute top-0 z-50 flex w-full items-center justify-between px-4 py-2">
             <SymbolHover />
-            <div className="flex w-fit flex-row items-center justify-center gap-2">
+            <div className="flex w-1/3 flex-row items-center justify-center gap-2">
                 <TUILink href="/" text="[0] home" isActive={active === "home"} />
                 <TUILink href="/about" text="[1] about" isActive={active === "about"} />
                 <TUILink href="/pricing" text="[2] pricing" isActive={active === "pricing"} />
             </div>
-            <TUILink href="/auth/sign-in" text="[3] sign in" isActive={active === "sign-in"} />
+            {/* <TUILink href="/auth/sign-in" text="[3] sign in" isActive={active === "sign-in"} /> */}
+            <div className="w-1/3" />
         </nav>
     );
 }
@@ -69,7 +70,7 @@ function TUILink({
 
 function SymbolHover() {
     return (
-        <Link className="group inline-block" href="/">
+        <Link className="group inline-block w-1/3" href="/">
             <span className="inline-block transform transition-transform duration-300 group-hover:-translate-x-1">
                 {"{"}
             </span>

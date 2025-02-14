@@ -1,14 +1,14 @@
 import AuthButtons from "@/components/auth/auth-buttons";
 import TUINavbar from "@/components/tui/tui-navbar";
-import { createClient } from "@/utils/supabase/server";
+import { createServerClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
-    const supabase = await createClient();
-    const { data } = await supabase.auth.getSession();
+    const supabase = await createServerClient();
+    const { data } = await supabase.auth.getUser();
 
-    if (data) return redirect("/dashboard");
+    if (data.user) return redirect("/dashboard");
 
     return (
         <div className="flex min-h-screen flex-col font-mono font-normal">

@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server";
+import { createServerClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     const redirectTo = requestUrl.searchParams.get("redirect_to")?.toString();
 
     if (code) {
-        const supabase = await createClient();
+        const supabase = await createServerClient();
         await supabase.auth.exchangeCodeForSession(code);
         const { data, error } = await supabase.auth.getUser();
         if (error) {
@@ -25,7 +25,7 @@ export async function GET(request: Request) {
         const diff = Math.abs(now.getTime() - createdAt.getTime());
         const diffSeconds = Math.floor(diff / 1000);
         if (diffSeconds < 30) {
-            return NextResponse.redirect(`${origin}/onboarding`);
+            return NextResponse.redirect(`${origin}/onboarding/username`);
         }
     }
 
