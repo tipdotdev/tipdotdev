@@ -66,7 +66,7 @@ export default function Page() {
         insertUsername(values.username)
             .then(() => {
                 toast.success("Username set successfully!");
-                window.location.href = "/onboarding/payouts";
+                window.location.href = "/onboarding/payout";
             })
             .catch((error) => {
                 toast.error(error.message);
@@ -76,7 +76,7 @@ export default function Page() {
     return (
         <div className="flex min-h-screen flex-col font-mono font-normal">
             <div className="absolute top-4 flex w-full items-center justify-center px-4">
-                <Progress value={25} className="w-full md:w-1/3" />
+                <Progress value={50} className="w-full md:w-1/3" />
             </div>
             <section className="relative flex h-screen flex-col items-center justify-center px-4 py-8">
                 <div className="flex w-full max-w-md flex-col gap-2">

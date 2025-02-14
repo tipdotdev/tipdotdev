@@ -23,6 +23,7 @@ export default async function Page() {
                 <DataItem label="ID" value={user.id} />
                 <DataItem label="Username" value={profile.data.username} />
                 <DataItem label="Email" value={user.email || "undefined"} />
+                <DataItem label="Stripe ID" value={profile.data.stripe_account_id || "undefined"} />
                 <DataItem label="Created at" value={user.created_at} />
                 <DataItem label="Updated at" value={user.updated_at || "undefined"} />
 
