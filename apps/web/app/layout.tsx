@@ -32,7 +32,6 @@ export const metadata: Metadata = {
             }
         ]
     },
-    robots: "noindex, nofollow",
     referrer: "no-referrer-when-downgrade",
     keywords:
         "tip.dev, coming soon, tip, dev, tipdev, developers, devs, ko-fi, buymeacoffee, link in bio, money, freelance, web dev"
