@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/sonner";
 import "@/styles/globals.css";
 import type { Metadata } from "next";
 import { Geist as FontSans, Nunito as FontSerif } from "next/font/google";
@@ -53,6 +54,7 @@ export default function RootLayout({
                 }`}
             >
                 {children}
+                <Toaster richColors />
             </body>
         </html>
     );
