@@ -18,14 +18,24 @@ export default async function Page() {
     return (
         <div className="flex min-h-screen flex-col items-center justify-center font-normal">
             <section className="relative mt-1 flex w-full max-w-lg flex-col items-start justify-center px-4 py-8">
-                <h1>User data:</h1>
+                <h1 className="mb-4">User data:</h1>
 
-                <DataItem label="ID" value={user.id} />
-                <DataItem label="Username" value={profile.data.username} />
-                <DataItem label="Email" value={user.email || "undefined"} />
-                <DataItem label="Stripe ID" value={profile.data.stripe_account_id || "undefined"} />
-                <DataItem label="Created at" value={user.created_at} />
-                <DataItem label="Updated at" value={user.updated_at || "undefined"} />
+                <div className="w-full rounded-lg border bg-muted/40 p-4">
+                    <DataItem label="ID" value={user.id} />
+                    <div className="my-1 w-full border-b border-foreground/20" />
+                    <DataItem label="Username" value={profile.data.username} />
+                    <div className="my-1 w-full border-b border-foreground/20" />
+                    <DataItem label="Email" value={user.email || "undefined"} />
+                    <div className="my-1 w-full border-b border-foreground/20" />
+                    <DataItem
+                        label="Stripe ID"
+                        value={profile.data.stripe_account_id || "undefined"}
+                    />
+                    <div className="my-1 w-full border-b border-foreground/20" />
+                    <DataItem label="Created at" value={user.created_at} />
+                    <div className="my-1 w-full border-b border-foreground/20" />
+                    <DataItem label="Updated at" value={user.updated_at || "undefined"} />
+                </div>
 
                 <Link
                     href="/auth/sign-out"
