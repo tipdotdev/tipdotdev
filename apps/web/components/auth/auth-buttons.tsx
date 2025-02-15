@@ -1,8 +1,8 @@
 "use client";
 
-import { signInWithOAuth } from "@/app/actions";
+import { signInWithOAuth } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
-import GitHubLogo from "@/public/images/svg/github.svg";
+import GitHubLogo from "@/public/icons/github.svg";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -34,7 +34,7 @@ export default function AuthButtons() {
                 onClick={() => handleClick("google")}
                 disabled={loading}
             >
-                <Image src="/images/svg/google.svg" alt="Google Logo" width={14} height={14} />
+                <Image src="/icons/google.svg" alt="Google Logo" width={14} height={14} />
                 Continue with Google
             </Button>
         </div>

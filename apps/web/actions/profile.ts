@@ -1,31 +1,6 @@
 "use server";
 
 import { createServerClient } from "@/utils/supabase/server";
-import { headers } from "next/headers";
-
-interface OAuthData {
-    provider: string;
-    url: string;
-}
-
-export async function signInWithOAuth(provider: "google" | "github"): Promise<OAuthData | null> {
-    const supabase = await createServerClient();
-    const origin = (await headers()).get("origin");
-
-    const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-            redirectTo: `${origin}/auth/callback`
-        }
-    });
-
-    if (error) {
-        console.error("Error signing in with OAuth", error);
-        return null;
-    }
-
-    return data;
-}
 
 export async function checkUsernameAvailability(username: string): Promise<boolean> {
     // Normalize username: trim whitespace and convert to lowercase
@@ -108,6 +83,22 @@ export async function getSelfProfile() {
 
     if (error) {
         console.error("Error getting self profile:", error);
+        return null;
+    }
+
+    return data;
+}
+
+export async function getProfile(username: string) {
+    const supabase = await createServerClient();
+    const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("username", username)
+        .single();
+
+    if (error) {
+        console.error("Error getting profile:", error);
         return null;
     }
 

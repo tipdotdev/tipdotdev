@@ -1,3 +1,4 @@
+import { getSelfProfile } from "@/actions/profile";
 import AccountDropdown from "@/components/dashboard/account-dropdown";
 import DashboardGrid, { DashboardGridItem } from "@/components/dashboard/grid";
 import { WelcomeBack } from "@/components/dashboard/home";
@@ -18,7 +19,6 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { createServerClient } from "@/utils/supabase/server";
 import { SquareIcon } from "lucide-react";
-import { getSelfProfile } from "../actions";
 
 export default async function Page() {
     const sb = await createServerClient();

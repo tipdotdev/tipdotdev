@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
             {
                 protocol: "https",
                 hostname: "auth.tip.dev"
+            },
+            {
+                protocol: "https",
+                hostname: "pbs.twimg.com"
             }
         ]
     },

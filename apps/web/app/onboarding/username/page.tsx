@@ -1,6 +1,6 @@
 "use client";
 
-import { checkUsernameAvailability, insertUsername } from "@/app/actions";
+import { checkUsernameAvailability, insertUsername } from "@/actions/profile";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";

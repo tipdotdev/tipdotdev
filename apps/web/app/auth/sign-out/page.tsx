@@ -1,7 +1,7 @@
-import { createServerClient } from "@/utils/supabase/server";
+import { signOut } from "@/actions/auth";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
-    (await createServerClient()).auth.signOut();
+    await signOut();
     return redirect("/auth/sign-in");
 }
