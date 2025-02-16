@@ -59,7 +59,8 @@ export async function insertUsername(username: string) {
 
     const { error } = await supabase.from("profiles").upsert({
         id: user?.id,
-        username: normalized
+        username: normalized,
+        avatar_url: user.user_metadata.avatar_url || null
     });
 
     if (error) {

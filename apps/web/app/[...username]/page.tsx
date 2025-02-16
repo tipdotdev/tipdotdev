@@ -1,5 +1,6 @@
 import { isSignedIn } from "@/actions/auth";
 import { getProfile, getSelfProfile } from "@/actions/profile";
+import PaymentCard from "@/components/profile/payment-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -60,12 +61,13 @@ export default async function MoviePage({ params }: Props) {
                         </div>
                     </div>
                     <Separator className="my-4" />
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid w-full grid-cols-2 gap-2">
                         <AboutCard
-                            bio={profile.bio}
+                            bio={profile.bio || "We don't know much about this user yet."}
                             website={profile.website}
                             socials={profile.social_media}
                         />
+                        <PaymentCard username={username} />
                     </div>
                 </div>
             </section>
@@ -104,10 +106,10 @@ function AboutCard({
 }: {
     bio?: string;
     website?: string;
-    socials: SocialMedia[];
+    socials?: SocialMedia[];
 }) {
     return (
-        <Card className="w-full border-border/40 bg-card/40 p-4">
+        <Card className="h-fit w-full border-border/40 bg-card/40 p-4">
             <CardHeader className="p-0">
                 <CardTitle className="text-foreground/60">About</CardTitle>
             </CardHeader>
@@ -125,7 +127,7 @@ function AboutCard({
                         </Link>
                     </div>
                 )}
-                {socials.length > 0 && (
+                {socials && socials.length > 0 && (
                     <div className="mt-4 flex flex-row gap-3">
                         {socials.map((social, index) => (
                             <Social key={index} social={social} />
