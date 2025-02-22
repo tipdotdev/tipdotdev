@@ -169,12 +169,6 @@ export default function PaymentCard({
                 ) : (
                     <div className="flex flex-col items-center justify-center gap-4 p-2">
                         <StripeCard
-                            // clientSecret={
-                            //     "pi_3QukQiRZS1pWGBue1pM2eoJ0_secret_mR9yQVWCPxtivtOPuhmfJjlo4"
-                            // }
-                            // accountID={"acct_1QsvlBRZS1pWGBue"}
-                            // amount={form.getValues("amount")}
-                            // amount={500}
                             amount={form.getValues("amount") * 100}
                             accountID={stripeAcctID}
                             clientSecret={paymentIntent?.client_secret || ""}
