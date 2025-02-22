@@ -16,7 +16,7 @@ type Props = {
     params: Promise<{ username: string }>;
 };
 
-export default async function MoviePage({ params }: Props) {
+export default async function Page({ params }: Props) {
     const username = (await params).username;
     const profile = await getProfile(username);
     const sn = await isSignedIn();
@@ -67,7 +67,11 @@ export default async function MoviePage({ params }: Props) {
                             website={profile.website}
                             socials={profile.social_media}
                         />
-                        <PaymentCard username={username} />
+                        <PaymentCard
+                            username={username}
+                            stripeAcctID={profile.stripe_account_id}
+                            isSignedIn={sn}
+                        />
                     </div>
                 </div>
             </section>

@@ -76,6 +76,10 @@ export async function getSelfProfile() {
         return null;
     }
 
+    if (userData.data.user.is_anonymous) {
+        return null;
+    }
+
     const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -100,6 +104,22 @@ export async function getProfile(username: string) {
 
     if (error) {
         console.error("Error getting profile:", error);
+        return null;
+    }
+
+    return data;
+}
+
+export async function getProfileByStripeAcctID(stripeAcctID: string) {
+    const supabase = await createServerClient();
+    const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("stripe_account_id", stripeAcctID)
+        .single();
+
+    if (error) {
+        console.error("Error getting profile by stripe account id:", error);
         return null;
     }
 

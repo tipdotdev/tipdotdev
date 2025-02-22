@@ -37,3 +37,13 @@ export async function signOut(): Promise<void> {
     const supabase = await createServerClient();
     await supabase.auth.signOut();
 }
+
+export async function signInAnonymously(): Promise<void> {
+    const supabase = await createServerClient();
+    const data = await supabase.auth.signInAnonymously();
+    if (data.error) {
+        console.error("Error signing in anonymously:", data.error);
+        throw new Error("Error signing in anonymously");
+    }
+    console.log("Anonymous sign in successful:", data);
+}
