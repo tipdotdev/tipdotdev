@@ -45,5 +45,4 @@ export async function signInAnonymously(): Promise<void> {
         console.error("Error signing in anonymously:", data.error);
         throw new Error("Error signing in anonymously");
     }
-    console.log("Anonymous sign in successful:", data);
 }

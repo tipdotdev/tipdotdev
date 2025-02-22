@@ -83,7 +83,7 @@ export async function completeTransaction(transactionId: string): Promise<{ succ
         })
         .eq("stripe_id", transactionId);
 
-    console.log(error);
+    console.error(error);
 
     if (error) {
         throw new Error("Error completing transaction");

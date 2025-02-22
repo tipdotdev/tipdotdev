@@ -21,7 +21,6 @@ export default function Home() {
                 </div>
 
                 <div className="mt-8 flex w-full max-w-md items-start gap-2">
-                    {/* <ASCIIButton text="Get Started" onClick={() => console.log("Clicked")} /> */}
                     <TUIBadge text="Coming Soon" />
                 </div>
             </section>
