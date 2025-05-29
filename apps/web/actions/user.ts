@@ -1,14 +1,25 @@
 "use server";
 
-import { createServerClient } from "@/utils/supabase/server";
+import { db } from "@/db";
+import { transaction } from "@/db/schema";
+import { auth } from "@/utils/auth";
+import { desc, eq } from "drizzle-orm";
+import { headers } from "next/headers";
 
 export async function getSelfUser() {
-    const supabase = await createServerClient();
-    const { data, error } = await supabase.auth.getUser();
-    if (error) {
-        console.error("Error getting user:", error);
-        return null;
-    }
+    const authData = await auth.api.getSession({
+        headers: await headers()
+    });
 
-    return data.user;
+    return authData?.user;
+}
+
+export async function getRecentTransactions(userId: string) {
+    const transactions = await db
+        .select()
+        .from(transaction)
+        .where(eq(transaction.toUserId, userId))
+        .orderBy(desc(transaction.createdAt));
+
+    return transactions;
 }

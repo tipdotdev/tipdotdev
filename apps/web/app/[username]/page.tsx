@@ -1,4 +1,3 @@
-import { isSignedIn } from "@/actions/auth";
 import { getProfile, getSelfProfile } from "@/actions/profile";
 import PaymentCard from "@/components/profile/payment-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -7,7 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import GitHubLogo from "@/public/icons/github.svg";
 import TwitterLogo from "@/public/icons/twitter.svg";
+import { auth } from "@/utils/auth";
 import { LinkIcon, ShareIcon } from "lucide-react";
+import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -19,7 +20,10 @@ type Props = {
 export default async function Page({ params }: Props) {
     const username = (await params).username;
     const profile = await getProfile(username);
-    const sn = await isSignedIn();
+    const authData = await auth.api.getSession({
+        headers: await headers()
+    });
+    const sn = authData?.session !== undefined;
     const user = await getSelfProfile();
     const isOwner = user?.username == username;
 
@@ -30,10 +34,7 @@ export default async function Page({ params }: Props) {
         <div className="flex min-h-screen flex-col items-center justify-start font-normal">
             <section className="relative mt-1 flex h-full w-full flex-col items-center justify-start px-4 py-4">
                 <div className="flex w-full max-w-full flex-col items-center justify-center gap-2 md:max-w-5xl">
-                    <Banner
-                        src={profile.banner_url}
-                        alt={profile.username + "'s banner on tip.dev"}
-                    />
+                    <Banner src={""} alt={profile.username + "'s banner on tip.dev"} />
                     <div className="-mt-4 flex w-full flex-row items-center justify-between gap-4">
                         <div className="flex items-center justify-center gap-4">
                             <Avatar className="h-24 w-24 border-[6px] border-background">
@@ -41,7 +42,7 @@ export default async function Page({ params }: Props) {
                                     {profile.username[0].toUpperCase()}
                                 </AvatarFallback>
                                 <AvatarImage
-                                    src={profile.avatar_url}
+                                    src={profile.avatarUrl || ""}
                                     alt={profile.username + "'s avatar on tip.dev"}
                                 />
                             </Avatar>
@@ -64,14 +65,24 @@ export default async function Page({ params }: Props) {
                     <div className="grid w-full grid-cols-2 gap-2">
                         <AboutCard
                             bio={profile.bio || "We don't know much about this user yet."}
-                            website={profile.website}
-                            socials={profile.social_media}
+                            website={profile.website || undefined}
+                            socials={undefined}
                         />
-                        <PaymentCard
-                            username={username}
-                            stripeAcctID={profile.stripe_account_id}
-                            isSignedIn={sn}
-                        />
+                        {profile.stripeConnected ? (
+                            <PaymentCard
+                                username={username}
+                                stripeAcctID={profile.stripeAcctID || ""}
+                                isSignedIn={sn}
+                            />
+                        ) : (
+                            <Card className="h-full w-full border-red-500/40 bg-red-500/20 p-4">
+                                <CardContent className="flex h-full flex-col items-center justify-center p-0">
+                                    <p className="text-sm">
+                                        This user is unable to receive tips at the moment.
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        )}
                     </div>
                 </div>
             </section>

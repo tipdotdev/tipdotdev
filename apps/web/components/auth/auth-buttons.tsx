@@ -1,23 +1,19 @@
 "use client";
 
-import { signInWithOAuth } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
 import GitHubLogo from "@/public/icons/github.svg";
 import Image from "next/image";
 import { useState } from "react";
-import { toast } from "sonner";
 
 export default function AuthButtons() {
     const [loading, setLoading] = useState<boolean>(false);
 
-    const handleClick = (provider: "google" | "github") => {
+    const handleClick = async (provider: "google" | "github") => {
         setLoading(true);
-        signInWithOAuth(provider).then((data) => {
-            if (data) {
-                window.location.href = data.url;
-            } else {
-                toast.error("Error signing in with GitHub");
-            }
+        await authClient.signIn.social({
+            provider,
+            callbackURL: "/dashboard"
         });
         setLoading(false);
     };

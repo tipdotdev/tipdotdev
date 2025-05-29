@@ -32,7 +32,7 @@ export default function AccountDropdown({ profile }: { profile: any }) {
                                 {profile.username ? profile.username[0].toUpperCase() : "U"}
                             </AvatarFallback>
                             <AvatarImage
-                                src={profile.avatar_url}
+                                src={profile.avatarUrl}
                                 alt={profile.username + "'s avatar"}
                             />
                         </Avatar>
