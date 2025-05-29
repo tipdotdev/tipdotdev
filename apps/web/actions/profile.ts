@@ -1,6 +1,10 @@
 "use server";
 
-import { createServerClient } from "@/utils/supabase/server";
+import { db } from "@/db";
+import { profile } from "@/db/schema";
+import { auth } from "@/utils/auth";
+import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
 
 export async function checkUsernameAvailability(username: string): Promise<boolean> {
     // Normalize username: trim whitespace and convert to lowercase
@@ -16,20 +20,10 @@ export async function checkUsernameAvailability(username: string): Promise<boole
         return false;
     }
 
-    const supabase = await createServerClient();
-    const { data, error } = await supabase
-        .from("profiles")
-        .select("username")
-        .eq("username", normalized)
-        .maybeSingle();
-
-    if (error) {
-        console.error("Error checking username availability:", error);
-        throw new Error("Error checking username availability");
-    }
+    const data = await db.select().from(profile).where(eq(profile.username, normalized));
 
     // Return true if no matching user exists, false otherwise
-    return data === null;
+    return data.length === 0;
 }
 
 export async function insertUsername(username: string) {
@@ -48,19 +42,18 @@ export async function insertUsername(username: string) {
         );
     }
 
-    const supabase = await createServerClient();
-    const {
-        data: { user }
-    } = await supabase.auth.getUser();
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
 
-    if (!user) {
+    if (!session) {
         throw new Error("User not authenticated");
     }
 
-    const { error } = await supabase.from("profiles").upsert({
-        id: user?.id,
+    const { error } = await db.insert(profile).values({
+        userId: session.user.id,
         username: normalized,
-        avatar_url: user.user_metadata.avatar_url || null
+        avatarUrl: session.user.image
     });
 
     if (error) {
@@ -70,58 +63,43 @@ export async function insertUsername(username: string) {
 }
 
 export async function getSelfProfile() {
-    const supabase = await createServerClient();
-    const userData = await supabase.auth.getUser();
-    if (!userData || userData.error) {
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    if (!session) {
         return null;
     }
 
-    if (userData.data.user.is_anonymous) {
-        return null;
-    }
-
-    const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userData.data?.user.id)
-        .single();
-
-    if (error) {
-        console.error("Error getting self profile:", error);
-        return null;
-    }
-
-    return data;
+    return await getProfileByUserId(session.user.id);
 }
 
 export async function getProfile(username: string) {
-    const supabase = await createServerClient();
-    const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("username", username)
-        .single();
+    const data = await db.select().from(profile).where(eq(profile.username, username));
 
-    if (error) {
-        console.error("Error getting profile:", error);
+    if (data.length === 0) {
         return null;
     }
 
-    return data;
+    return data[0];
+}
+
+export async function getProfileByUserId(userId: string) {
+    const data = await db.select().from(profile).where(eq(profile.userId, userId));
+
+    if (data.length === 0) {
+        return null;
+    }
+
+    return data[0];
 }
 
 export async function getProfileByStripeAcctID(stripeAcctID: string) {
-    const supabase = await createServerClient();
-    const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("stripe_account_id", stripeAcctID)
-        .single();
+    const data = await db.select().from(profile).where(eq(profile.stripeAcctID, stripeAcctID));
 
-    if (error) {
-        console.error("Error getting profile by stripe account id:", error);
+    if (data.length === 0) {
         return null;
     }
 
-    return data;
+    return data[0];
 }

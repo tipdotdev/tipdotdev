@@ -1,7 +1,7 @@
 import { getSelfProfile } from "@/actions/profile";
 import AccountDropdown from "@/components/dashboard/account-dropdown";
 import DashboardGrid, { DashboardGridItem } from "@/components/dashboard/grid";
-import { WelcomeBack } from "@/components/dashboard/home";
+import { RecentTransactions, WelcomeBack } from "@/components/dashboard/home";
 import PercentChange from "@/components/dashboard/percent-change";
 import {
     Breadcrumb,
@@ -17,19 +17,24 @@ import {
     SelectValue
 } from "@/components/ui/select";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { createServerClient } from "@/utils/supabase/server";
+import { auth } from "@/utils/auth";
 import { SquareIcon } from "lucide-react";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
-    const sb = await createServerClient();
     const profile = await getSelfProfile();
-    const {
-        data: { user },
-        error
-    } = await sb.auth.getUser();
+    const authData = await auth.api.getSession({
+        headers: await headers()
+    });
+    const user = authData?.user;
 
-    if (!profile || error) {
-        return null;
+    if (!user) {
+        redirect("/login");
+    }
+
+    if (!profile) {
+        redirect("/onboarding/username");
     }
 
     return (
@@ -113,6 +118,9 @@ export default async function Page() {
                                 <p className="font-mono text-xs text-foreground/60">21 Subs</p>
                             </div>
                         </div>
+                    </DashboardGridItem>
+                    <DashboardGridItem className="col-span-4">
+                        <RecentTransactions userId={user.id} />
                     </DashboardGridItem>
                 </DashboardGrid>
             </section>

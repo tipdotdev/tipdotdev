@@ -1,15 +1,11 @@
 import { completeTransaction } from "@/actions/stripe";
-import { createServerClient } from "@/utils/supabase/server";
+import { getSelfUser } from "@/actions/user";
 
 export async function POST(request: Request) {
     try {
-        const sb = await createServerClient();
-        const {
-            data: { user },
-            error
-        } = await sb.auth.getUser();
+        const user = await getSelfUser();
 
-        if (error || !user) {
+        if (!user) {
             return new Response(JSON.stringify({ error: "Unauthorized" }), {
                 status: 401,
                 headers: { "Content-Type": "application/json" }

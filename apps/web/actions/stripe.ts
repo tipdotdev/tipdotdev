@@ -1,9 +1,11 @@
 "use server";
 
+import { db } from "@/db";
+import { transaction } from "@/db/schema";
 import { PaymentIntentSimple } from "@/types/stripe";
-import { createServerClient } from "@/utils/supabase/server";
+import { eq } from "drizzle-orm";
 import { Stripe } from "stripe";
-import { getProfileByStripeAcctID, getSelfProfile } from "./profile";
+import { getProfileByStripeAcctID } from "./profile";
 import { getSelfUser } from "./user";
 
 export async function createPaymentIntent(
@@ -13,7 +15,6 @@ export async function createPaymentIntent(
     fromAcctID?: string,
     metadata?: Record<string, string>
 ): Promise<PaymentIntentSimple> {
-    const sb = await createServerClient();
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { typescript: true });
 
     // Create the payment intent
@@ -33,10 +34,10 @@ export async function createPaymentIntent(
     // get the user id from the toAcctID
     const user = await getProfileByStripeAcctID(toAcctID);
     const selfUser = await getSelfUser();
-    let selfProfile;
+    // let selfProfile;
 
-    if (!selfUser?.is_anonymous) {
-        selfProfile = await getSelfProfile();
+    if (!selfUser?.isAnonymous) {
+        // selfProfile = await getSelfProfile();
     }
 
     if (!user) {
@@ -48,16 +49,26 @@ export async function createPaymentIntent(
     }
 
     // save the payment intent to the transaction table
-    const { error } = await sb.from("transactions").insert({
-        to_user_id: user.id,
-        from_user_id: selfUser.id,
-        from_user_name: selfProfile?.username || "Anonymous",
-        message: metadata?.message || null,
+    // const { error } = await sb.from("transactions").insert({
+    //     to_user_id: user.id,
+    //     from_user_id: selfUser.id,
+    //     from_user_name: selfProfile?.username || "Anonymous",
+    //     message: metadata?.message || null,
+    //     amount: amount * 100,
+    //     stripe_id: pi.id,
+    //     type: "tip",
+    //     is_completed: false,
+    //     from_user_email: fromEmail
+    // });
+    const { error } = await db.insert(transaction).values({
         amount: amount * 100,
-        stripe_id: pi.id,
+        fromUserId: selfUser.id,
+        toUserId: user.userId,
+        stripeId: pi.id,
         type: "tip",
-        is_completed: false,
-        from_user_email: fromEmail
+        isCompleted: false,
+        message: metadata?.message || "No message",
+        fromUserEmail: fromEmail
     });
 
     if (error) {
@@ -73,15 +84,13 @@ export async function createPaymentIntent(
 }
 
 export async function completeTransaction(transactionId: string): Promise<{ success: boolean }> {
-    const sb = await createServerClient();
-
-    const { error } = await sb
-        .from("transactions")
-        .update({
-            is_completed: true,
-            completed_at: new Date()
+    const { error } = await db
+        .update(transaction)
+        .set({
+            isCompleted: true,
+            updatedAt: new Date()
         })
-        .eq("stripe_id", transactionId);
+        .where(eq(transaction.stripeId, transactionId));
 
     console.error(error);
 

@@ -1,16 +1,15 @@
-import { createServerClient } from "@/utils/supabase/server";
+import { getProfileByUserId } from "@/actions/profile";
+import { getSelfUser } from "@/actions/user";
+import { db } from "@/db";
+import { profile } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { Stripe } from "stripe";
 
 export async function POST() {
     try {
-        // get the user making the request
-        const sb = await createServerClient();
-        const {
-            data: { user },
-            error
-        } = await sb.auth.getUser();
+        const user = await getSelfUser();
 
-        if (error || !user) {
+        if (!user) {
             return new Response(
                 JSON.stringify({
                     error: "Unauthorized: You must be signed in to perform this action"
@@ -23,6 +22,14 @@ export async function POST() {
         }
 
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { typescript: true });
+        const userProfile = await getProfileByUserId(user.id);
+
+        if (!userProfile) {
+            return new Response(JSON.stringify({ error: "User profile not found" }), {
+                status: 404,
+                headers: { "Content-Type": "application/json" }
+            });
+        }
 
         const stripeAccount = await stripe.accounts.create({
             type: "express",
@@ -36,11 +43,10 @@ export async function POST() {
         });
 
         // save the stripe account id to the user
-        const data = await sb
-            .from("profiles")
-            .update({ stripe_account_id: stripeAccount.id })
-            .eq("id", user.id)
-            .select();
+        const data = await db
+            .update(profile)
+            .set({ stripeAcctID: stripeAccount.id, stripeConnected: true })
+            .where(eq(profile.userId, user.id));
 
         if (data.error) {
             return new Response(

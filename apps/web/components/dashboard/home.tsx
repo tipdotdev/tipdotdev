@@ -1,7 +1,9 @@
 "use client";
 
+import { getRecentTransactions } from "@/actions/user";
 import { CopyIcon } from "lucide-react";
 import ms from "ms";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
@@ -16,9 +18,9 @@ export function WelcomeBack({ profile, user }: { profile: any; user: any }) {
         <div className="flex w-full items-center justify-between gap-3">
             <div className="flex items-center justify-start gap-3">
                 <Avatar className="hidden md:flex">
-                    <AvatarFallback>{profile.username[0]}</AvatarFallback>
+                    <AvatarFallback>{profile.username}</AvatarFallback>
                     <AvatarImage
-                        src={profile.avatar_url}
+                        src={profile.avatarUrl}
                         alt={profile.username + "'s profile picture on tip.dev"}
                     />
                 </Avatar>
@@ -38,7 +40,7 @@ export function WelcomeBack({ profile, user }: { profile: any; user: any }) {
                     Joined{" "}
                     {ms(
                         Date.now() -
-                            new Date((new Date(user.created_at).getTime() / 1000) * 1000).getTime(),
+                            new Date((new Date(user.createdAt).getTime() / 1000) * 1000).getTime(),
                         {
                             long: true
                         }
@@ -49,13 +51,52 @@ export function WelcomeBack({ profile, user }: { profile: any; user: any }) {
                     Updated{" "}
                     {ms(
                         Date.now() -
-                            new Date((new Date(user.updated_at).getTime() / 1000) * 1000).getTime(),
+                            new Date((new Date(user.updatedAt).getTime() / 1000) * 1000).getTime(),
                         {
                             long: true
                         }
                     )}{" "}
                     ago
                 </p>
+            </div>
+        </div>
+    );
+}
+
+export function RecentTransactions({ userId }: { userId: string }) {
+    const [transactions, setTransactions] = useState<
+        Array<{
+            id: number;
+            fromUserEmail: string | null;
+            amount: number;
+            createdAt: string;
+        }>
+    >([]);
+
+    useEffect(() => {
+        getRecentTransactions(userId).then((data) => {
+            setTransactions(
+                data.map((transaction) => ({
+                    ...transaction,
+                    createdAt: new Date(transaction.createdAt).toLocaleString()
+                }))
+            );
+        });
+    }, [userId]);
+
+    return (
+        <div className="flex w-full flex-col items-start justify-start gap-2">
+            <h3 className="text-lg font-bold">Recent Transactions</h3>
+            <div className="mt-4 flex w-full flex-col gap-2">
+                {transactions.map((transaction) => (
+                    <div
+                        key={transaction.id}
+                        className="flex w-full flex-row items-center justify-between"
+                    >
+                        <p className="text-sm font-bold">{transaction.fromUserEmail}</p>
+                        <p className="text-sm text-foreground/60">${transaction.amount / 100}</p>
+                    </div>
+                ))}
             </div>
         </div>
     );

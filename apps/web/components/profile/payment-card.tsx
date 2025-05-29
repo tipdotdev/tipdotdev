@@ -1,10 +1,10 @@
 "use client";
 
-import { signInAnonymously } from "@/actions/auth";
 import { createPaymentIntent } from "@/actions/stripe";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
 import { PaymentIntentSimple } from "@/types/stripe";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
@@ -44,7 +44,8 @@ export default function PaymentCard({
     // Anonymous sign-in on mount (if not already signed in)
     useEffect(() => {
         if (!isSignedIn) {
-            signInAnonymously()
+            authClient.signIn
+                .anonymous()
                 .then(() => {
                     console.log("Anonymous sign in successful");
                 })
