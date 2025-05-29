@@ -17,13 +17,15 @@ export async function createPaymentIntent(
 ): Promise<PaymentIntentSimple> {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { typescript: true });
 
+    const fee = Math.round(amount * 100 * 0.045);
+
     // Create the payment intent
     const pi = await stripe.paymentIntents.create(
         {
             amount: amount * 100,
             currency: "usd",
             receipt_email: fromEmail,
-            application_fee_amount: Math.round(amount * 100 * 0.05), // Ensure it's an integer
+            application_fee_amount: fee, // take a 4.5% transaction fee
             metadata: metadata
         },
         {
@@ -48,18 +50,6 @@ export async function createPaymentIntent(
         throw new Error("Self not found");
     }
 
-    // save the payment intent to the transaction table
-    // const { error } = await sb.from("transactions").insert({
-    //     to_user_id: user.id,
-    //     from_user_id: selfUser.id,
-    //     from_user_name: selfProfile?.username || "Anonymous",
-    //     message: metadata?.message || null,
-    //     amount: amount * 100,
-    //     stripe_id: pi.id,
-    //     type: "tip",
-    //     is_completed: false,
-    //     from_user_email: fromEmail
-    // });
     const { error } = await db.insert(transaction).values({
         amount: amount * 100,
         fromUserId: selfUser.id,

@@ -1,7 +1,7 @@
 "use client";
 
 import { getRecentTransactions } from "@/actions/user";
-import { CopyIcon } from "lucide-react";
+import { CopyIcon, SquareIcon } from "lucide-react";
 import ms from "ms";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -70,6 +70,7 @@ export function RecentTransactions({ userId }: { userId: string }) {
             fromUserEmail: string | null;
             amount: number;
             createdAt: string;
+            type: "tip" | "subscription";
         }>
     >([]);
 
@@ -78,7 +79,8 @@ export function RecentTransactions({ userId }: { userId: string }) {
             setTransactions(
                 data.map((transaction) => ({
                     ...transaction,
-                    createdAt: new Date(transaction.createdAt).toLocaleString()
+                    createdAt: new Date(transaction.createdAt).toLocaleString(),
+                    type: transaction.type as "tip" | "subscription"
                 }))
             );
         });
@@ -91,10 +93,31 @@ export function RecentTransactions({ userId }: { userId: string }) {
                 {transactions.map((transaction) => (
                     <div
                         key={transaction.id}
-                        className="flex w-full flex-row items-center justify-between"
+                        className="flex w-full flex-row items-center justify-between rounded-md border border-border bg-background p-2"
                     >
-                        <p className="text-sm font-bold">{transaction.fromUserEmail}</p>
-                        <p className="text-sm text-foreground/60">${transaction.amount / 100}</p>
+                        <div className="flex flex-col items-start justify-start gap-2">
+                            <div className="flex flex-row items-center justify-center gap-1">
+                                <SquareIcon
+                                    className={`size-3 ${
+                                        transaction.type === "tip"
+                                            ? "fill-green-400 text-green-400"
+                                            : "fill-blue-400 text-blue-400"
+                                    }`}
+                                />
+                                <p className="text-sm font-normal text-foreground/60">
+                                    {transaction.type === "tip" ? "Tip" : "Subscription"} from
+                                </p>
+                            </div>
+                            <p className="text-sm font-bold">{transaction.fromUserEmail}</p>
+                        </div>
+                        <div className="flex flex-col items-end justify-center gap-0">
+                            <p className="text-lg font-bold text-foreground">
+                                ${transaction.amount / 100}
+                            </p>
+                            <p className="text-sm font-normal text-foreground/60">
+                                ${((transaction.amount / 100) * 0.045).toFixed(2)} fee
+                            </p>
+                        </div>
                     </div>
                 ))}
             </div>
