@@ -3,7 +3,7 @@
 import { db } from "@/db";
 import { transaction } from "@/db/schema";
 import { auth } from "@/utils/auth";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 
 export async function getSelfUser() {
@@ -18,7 +18,7 @@ export async function getRecentTransactions(userId: string) {
     const transactions = await db
         .select()
         .from(transaction)
-        .where(eq(transaction.toUserId, userId))
+        .where(and(eq(transaction.toUserId, userId), eq(transaction.isCompleted, true)))
         .orderBy(desc(transaction.createdAt));
 
     return transactions;
