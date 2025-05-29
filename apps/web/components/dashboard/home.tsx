@@ -71,6 +71,7 @@ export function RecentTransactions({ userId }: { userId: string }) {
             amount: number;
             createdAt: string;
             type: "tip" | "subscription";
+            stripeId: string;
         }>
     >([]);
 
@@ -80,7 +81,8 @@ export function RecentTransactions({ userId }: { userId: string }) {
                 data.map((transaction) => ({
                     ...transaction,
                     createdAt: new Date(transaction.createdAt).toLocaleString(),
-                    type: transaction.type as "tip" | "subscription"
+                    type: transaction.type as "tip" | "subscription",
+                    stripeId: transaction.stripeId
                 }))
             );
         });
@@ -108,11 +110,11 @@ export function RecentTransactions({ userId }: { userId: string }) {
                                     {transaction.type === "tip" ? "Tip" : "Subscription"} from
                                 </p>
                             </div>
-                            <p className="text-sm font-bold">{transaction.fromUserEmail}</p>
+                            <p className="text-md font-bold">{transaction.fromUserEmail}</p>
                         </div>
                         <div className="flex flex-col items-end justify-center gap-0">
                             <p className="text-lg font-bold text-foreground">
-                                ${transaction.amount / 100}
+                                ${(transaction.amount / 100).toLocaleString("en-US")}
                             </p>
                             <p className="text-sm font-normal text-foreground/60">
                                 ${((transaction.amount / 100) * 0.045).toFixed(2)} fee

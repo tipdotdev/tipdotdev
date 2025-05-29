@@ -1,4 +1,5 @@
 import { getSelfProfile } from "@/actions/profile";
+import { getRecentTransactions } from "@/actions/user";
 import AccountDropdown from "@/components/dashboard/account-dropdown";
 import DashboardGrid, { DashboardGridItem } from "@/components/dashboard/grid";
 import { RecentTransactions, WelcomeBack } from "@/components/dashboard/home";
@@ -37,6 +38,15 @@ export default async function Page() {
         redirect("/onboarding/username");
     }
 
+    const transactions = await getRecentTransactions(user.id);
+    const income = transactions.reduce((acc, curr) => acc + curr.amount, 0);
+    const incomeFromTips = transactions
+        .filter((t) => t.type === "tip")
+        .reduce((acc, curr) => acc + curr.amount, 0);
+    const incomeFromSubs = transactions
+        .filter((t) => t.type === "subscription")
+        .reduce((acc, curr) => acc + curr.amount, 0);
+
     return (
         <div className="flex min-h-screen flex-col items-center justify-center font-normal">
             <section className="relative mt-1 flex h-full w-full flex-col items-start justify-start px-4 py-4">
@@ -74,18 +84,26 @@ export default async function Page() {
                             </Select>
                         </div>
                         <div className="mt-2 flex items-center justify-start gap-4">
-                            <p className="text-4xl font-extrabold">$5,383.29</p>
+                            <p className="text-4xl font-extrabold">
+                                ${(Number(income ?? 0) / 100).toLocaleString("en-US")}
+                            </p>
                             <PercentChange value={12.5} positive showText />
                         </div>
 
                         <div className="mt-4 flex w-full flex-row items-center gap-4">
                             <div className="flex flex-row items-center justify-center gap-1">
                                 <SquareIcon className="size-3 fill-green-400 text-green-400" />
-                                <p className="font-mono text-xs text-foreground/60">$3.4k Tips</p>
+                                <p className="font-mono text-xs text-foreground/60">
+                                    ${(Number(incomeFromTips ?? 0) / 100).toLocaleString("en-US")}{" "}
+                                    Tips
+                                </p>
                             </div>
                             <div className="flex flex-row items-center justify-center gap-1">
                                 <SquareIcon className="size-3 fill-blue-400 text-blue-400" />
-                                <p className="font-mono text-xs text-foreground/60">$1.9k Subs</p>
+                                <p className="font-mono text-xs text-foreground/60">
+                                    ${(Number(incomeFromSubs ?? 0) / 100).toLocaleString("en-US")}{" "}
+                                    Subs
+                                </p>
                             </div>
                         </div>
                     </DashboardGridItem>
