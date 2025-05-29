@@ -88,6 +88,8 @@ export async function completeTransaction(transactionId: string): Promise<{ succ
         throw new Error("Error completing transaction");
     }
 
+    // later we will email the user and the creator of the transaction
+
     return {
         success: true
     };
