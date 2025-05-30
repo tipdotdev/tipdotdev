@@ -1,4 +1,5 @@
 import { getProfile, getSelfProfile } from "@/actions/profile";
+import { getSupporterCount } from "@/actions/user";
 import PaymentCard from "@/components/profile/payment-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,8 @@ export default async function Page({ params }: Props) {
     // If the profile doesn't exist, show a 404 page
     if (!profile) notFound();
 
+    const supporters = await getSupporterCount(profile.userId);
+
     return (
         <div className="flex min-h-screen flex-col items-center justify-start font-normal">
             <section className="relative mt-1 flex h-full w-full flex-col items-center justify-start px-4 py-4">
@@ -48,7 +51,7 @@ export default async function Page({ params }: Props) {
                             </Avatar>
                             <div className="flex flex-col items-start justify-center gap-1">
                                 <p className="font-mono text-2xl">{username}</p>
-                                <ProfileStats supporters={1240} />
+                                <ProfileStats supporters={supporters} />
                             </div>
                         </div>
                         <div className="flex items-center justify-center gap-4">
