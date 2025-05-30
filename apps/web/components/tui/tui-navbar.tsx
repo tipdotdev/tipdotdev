@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function TUINavbar({
-    active
+    active,
+    disableKeyboardNavigation
 }: {
     active: undefined | "home" | "about" | "pricing" | "sign-in";
+    disableKeyboardNavigation?: boolean;
 }) {
     const router = useRouter();
 
@@ -26,11 +28,15 @@ export default function TUINavbar({
             }
         };
 
-        window.addEventListener("keydown", handleKeyDown);
+        if (!disableKeyboardNavigation) {
+            window.addEventListener("keydown", handleKeyDown);
+        }
         return () => {
-            window.removeEventListener("keydown", handleKeyDown);
+            if (!disableKeyboardNavigation) {
+                window.removeEventListener("keydown", handleKeyDown);
+            }
         };
-    }, [router]);
+    }, [router, disableKeyboardNavigation]);
 
     return (
         <nav className="absolute top-0 z-50 flex w-full items-center justify-between px-4 py-2">
