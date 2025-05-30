@@ -27,18 +27,18 @@ const items = [
     },
     {
         title: "Settings",
-        url: "#",
+        url: "/dashboard/settings",
         icon: Settings
     }
 ];
 
 export function Sidebar() {
     return (
-        <Sb collapsible="icon" variant="floating">
-            <SidebarHeader>
+        <Sb collapsible="icon" variant="inset">
+            <SidebarHeader className="border-0">
                 <p className="text-md font-mono">{"{$}"}</p>
             </SidebarHeader>
-            <SidebarContent className="border-0">
+            <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupContent>
                         <SidebarMenu>
