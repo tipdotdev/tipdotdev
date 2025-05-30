@@ -62,14 +62,13 @@ export default function PaymentCard({
         setIsLoading(true); // Disable button and show loading state
 
         try {
+            console.log("Form values:", values);
+            console.log("Email being sent:", values.email);
+
             const sai: string = stripeAcctID as string; // Type assertion
-            const pi = await createPaymentIntent(
-                values.amount,
-                sai,
-                values.email,
-                undefined,
-                undefined
-            );
+            const pi = await createPaymentIntent(values.amount, sai, values.email, undefined, {
+                message: values.message || "No message"
+            });
             setPaymentIntent(pi as PaymentIntentSimple);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {

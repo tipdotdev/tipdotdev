@@ -1,9 +1,7 @@
 "use client";
 
-import { getRecentTransactions } from "@/actions/user";
-import { CopyIcon, SquareIcon } from "lucide-react";
+import { CopyIcon } from "lucide-react";
 import ms from "ms";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
@@ -58,70 +56,6 @@ export function WelcomeBack({ profile, user }: { profile: any; user: any }) {
                     )}{" "}
                     ago
                 </p>
-            </div>
-        </div>
-    );
-}
-
-export function RecentTransactions({ userId }: { userId: string }) {
-    const [transactions, setTransactions] = useState<
-        Array<{
-            id: number;
-            fromUserEmail: string | null;
-            amount: number;
-            createdAt: string;
-            type: "tip" | "subscription";
-            stripeId: string;
-        }>
-    >([]);
-
-    useEffect(() => {
-        getRecentTransactions(userId).then((data) => {
-            setTransactions(
-                data.map((transaction) => ({
-                    ...transaction,
-                    createdAt: new Date(transaction.createdAt).toLocaleString(),
-                    type: transaction.type as "tip" | "subscription",
-                    stripeId: transaction.stripeId
-                }))
-            );
-        });
-    }, [userId]);
-
-    return (
-        <div className="flex w-full flex-col items-start justify-start gap-2">
-            <h3 className="text-lg font-bold">Recent Transactions</h3>
-            <div className="mt-4 flex w-full flex-col gap-2">
-                {transactions.map((transaction) => (
-                    <div
-                        key={transaction.id}
-                        className="flex w-full flex-row items-center justify-between rounded-md border border-border bg-background p-2"
-                    >
-                        <div className="flex flex-col items-start justify-start gap-2">
-                            <div className="flex flex-row items-center justify-center gap-1">
-                                <SquareIcon
-                                    className={`size-3 ${
-                                        transaction.type === "tip"
-                                            ? "fill-green-400 text-green-400"
-                                            : "fill-blue-400 text-blue-400"
-                                    }`}
-                                />
-                                <p className="text-sm font-normal text-foreground/60">
-                                    {transaction.type === "tip" ? "Tip" : "Subscription"} from
-                                </p>
-                            </div>
-                            <p className="text-md font-bold">{transaction.fromUserEmail}</p>
-                        </div>
-                        <div className="flex flex-col items-end justify-center gap-0">
-                            <p className="text-lg font-bold text-foreground">
-                                ${(transaction.amount / 100).toLocaleString("en-US")}
-                            </p>
-                            <p className="text-sm font-normal text-foreground/60">
-                                ${((transaction.amount / 100) * 0.045).toFixed(2)} fee
-                            </p>
-                        </div>
-                    </div>
-                ))}
             </div>
         </div>
     );

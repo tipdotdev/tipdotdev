@@ -3,7 +3,7 @@
 import { db } from "@/db";
 import { transaction } from "@/db/schema";
 import { auth } from "@/utils/auth";
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 
 export async function getSelfUser() {
@@ -22,4 +22,14 @@ export async function getRecentTransactions(userId: string) {
         .orderBy(desc(transaction.createdAt));
 
     return transactions;
+}
+
+export async function getSupporterCount(userId: string) {
+    const supporters = await db
+        .select({ count: count() })
+        .from(transaction)
+        .where(and(eq(transaction.toUserId, userId), eq(transaction.isCompleted, true)))
+        .groupBy(transaction.fromUserEmail);
+
+    return supporters.length;
 }
