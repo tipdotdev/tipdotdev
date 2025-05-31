@@ -20,7 +20,8 @@ export async function POST(request: Request) {
         const { payment_intent } = await request.json();
 
         // complete the transaction
-        const { success, transaction, paymentMethod } = await completeTransaction(payment_intent);
+        const { success, transaction, paymentMethod, alreadyProcessed } =
+            await completeTransaction(payment_intent);
 
         if (!success) {
             return new Response(JSON.stringify({ error: "Transaction failed" }), {
@@ -29,23 +30,26 @@ export async function POST(request: Request) {
             });
         }
 
-        // send the tip emails
-        const { success: senderEmailSuccess } = await sendTipReceipts({
-            senderEmail: transaction.fromUserEmail || "",
-            recieverEmail: user.email,
-            recieverUsername: profile?.username || "",
-            recieverAvatar: profile?.avatarUrl || "",
-            recieverBio: undefined,
-            message: transaction.message || undefined,
-            amount: transaction.amount,
-            processingFee: 0,
-            date: new Date().toISOString(),
-            tipId: transaction.id.toString(),
-            paymentMethod: paymentMethod || ""
-        });
+        // Only send emails if this is a newly completed transaction
+        if (!alreadyProcessed) {
+            // send the tip emails
+            const { success: senderEmailSuccess } = await sendTipReceipts({
+                senderEmail: transaction.fromUserEmail || "",
+                recieverEmail: user.email,
+                recieverUsername: profile?.username || "",
+                recieverAvatar: profile?.avatarUrl || "",
+                recieverBio: undefined,
+                message: transaction.message || undefined,
+                amount: transaction.amount,
+                processingFee: 0,
+                date: new Date().toISOString(),
+                tipId: transaction.id.toString(),
+                paymentMethod: paymentMethod || ""
+            });
 
-        if (!senderEmailSuccess) {
-            console.log("Failed to send tip receipt", senderEmailSuccess);
+            if (!senderEmailSuccess) {
+                console.log("Failed to send tip receipt", senderEmailSuccess);
+            }
         }
 
         // return a 200 status

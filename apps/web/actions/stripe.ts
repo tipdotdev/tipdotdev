@@ -76,7 +76,30 @@ export async function completeTransaction(transactionId: string): Promise<{
     success: boolean;
     transaction: typeof transaction.$inferSelect;
     paymentMethod: string | null;
+    alreadyProcessed: boolean;
 }> {
+    // First check if the transaction is already completed
+    const [existingTransaction] = await db
+        .select()
+        .from(transaction)
+        .where(eq(transaction.stripeId, transactionId))
+        .limit(1);
+
+    if (!existingTransaction) {
+        throw new Error("Transaction not found");
+    }
+
+    // If already completed, return the existing transaction without processing again
+    if (existingTransaction.isCompleted) {
+        return {
+            transaction: existingTransaction,
+            success: true,
+            paymentMethod: null, // We don't need to fetch payment method again for completed transactions
+            alreadyProcessed: true
+        };
+    }
+
+    // Only proceed with completion if not already completed
     const [updatedTransaction] = await db
         .update(transaction)
         .set({
@@ -102,7 +125,9 @@ export async function completeTransaction(transactionId: string): Promise<{
     return {
         transaction: updatedTransaction,
         success: true,
-        paymentMethod: pm.type === "card" ? (pm.card?.last4 ?? null) : (pm.type?.toString() ?? null)
+        paymentMethod:
+            pm.type === "card" ? (pm.card?.last4 ?? null) : (pm.type?.toString() ?? null),
+        alreadyProcessed: false
     };
 }
 
