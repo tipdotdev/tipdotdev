@@ -12,7 +12,7 @@ import {
     Section,
     Text
 } from "@react-email/components";
-import { container, footer, footerLink, footerSmall, footerText } from "./common-styles";
+import { container, footer, footerLink, footerSmall, footerText, main } from "./common-styles";
 import { InfoAlert } from "./components/alert";
 import { SuccessCallout } from "./components/callout";
 import { EmailTerminalFooter } from "./components/footer";
@@ -196,11 +196,6 @@ TipReceiptEmail.PreviewProps = {
 };
 
 export default TipReceiptEmail;
-
-const main = {
-    backgroundColor: "#f9fafb",
-    fontFamily: "system-ui, sans-serif"
-};
 
 const contentSection = {
     padding: "24px"
