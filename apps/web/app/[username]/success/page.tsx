@@ -51,11 +51,12 @@ export default function SuccessPage() {
         return (
             <div className="flex h-screen w-screen items-center justify-center">
                 <div className="flex flex-col items-center justify-center gap-1">
-                    <XCircleIcon className="h-12 w-12 text-red-500" />
+                    <XCircleIcon className="h-12 w-12 text-orange-500" />
 
                     <h1 className="text-2xl font-bold">Something went wrong</h1>
                     <p className="text-sm text-foreground/80">
-                        Your payment was successful, but something on our end went wrong.
+                        <strong>Your payment was successful</strong>, but something on our end went
+                        wrong.
                     </p>
                     <Button variant="secondary" size="lg" className="mt-8 w-full" asChild>
                         <Link href={`/${username}`}>Go back to {username}&apos;s profile</Link>
