@@ -74,16 +74,16 @@ export const profile = pgTable("profile", {
 
 export const transaction = pgTable("transaction", {
     id: serial("id").primaryKey(),
-    fromUserId: text("from_user_id")
-        .notNull()
-        .references(() => user.id, { onDelete: "no action" }),
-    toUserId: text("to_user_id")
-        .notNull()
-        .references(() => user.id, { onDelete: "no action" }),
+    fromUserId: text("from_user_id").references(() => user.id, { onDelete: "set null" }),
+    toUserId: text("to_user_id").references(() => user.id, { onDelete: "set null" }),
     amount: integer("amount").notNull(),
     applicationFee: integer("application_fee")
         .$defaultFn(() => 0)
         .notNull(),
+    stripeFee: integer("stripe_fee")
+        .$defaultFn(() => 0)
+        .notNull(),
+    netAmount: integer("net_amount").notNull(),
     stripeId: text("stripe_id").notNull(),
     type: text("type").notNull(),
     isCompleted: boolean("is_completed")

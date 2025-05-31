@@ -71,6 +71,13 @@
       "when": 1748726949161,
       "tag": "0009_light_argent",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1748733922174,
+      "tag": "0010_faithful_lester",
+      "breakpoints": true
     }
   ]
 }
