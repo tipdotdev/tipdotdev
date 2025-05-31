@@ -1,12 +1,14 @@
 "use client";
 
-import { TUIBadge } from "@/components/tui/tui-badge";
 import TUINavbar from "@/components/tui/tui-navbar";
+import WaitlistForm from "@/components/waitlist-form";
+import { useState } from "react";
 
 export default function Home() {
+    const [formFocused, setFormFocused] = useState(false);
     return (
         <div className="flex min-h-screen flex-col font-mono font-normal">
-            <TUINavbar active="home" />
+            <TUINavbar active="home" disableKeyboardNavigation={formFocused} />
             {/* Full-height Hero Section */}
             <section className="relative flex h-screen flex-col items-center justify-center px-4 py-8">
                 <div className="flex max-w-md flex-col gap-2">
@@ -20,8 +22,11 @@ export default function Home() {
                     </span>
                 </div>
 
-                <div className="mt-8 flex w-full max-w-md items-start gap-2">
-                    <TUIBadge text="Coming Soon" />
+                <div className="mt-8 w-full max-w-md border-t border-dashed border-border" />
+
+                <div className="mt-8 flex w-full max-w-md flex-col items-start gap-2">
+                    {/* <TUIBadge text="Coming Soon" /> */}
+                    <WaitlistForm setFormFocused={setFormFocused} />
                 </div>
             </section>
         </div>
