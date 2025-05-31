@@ -46,10 +46,13 @@ export default function IncomeWidget({ userId }: { userId: string }) {
     }, [userId, timePeriod]);
 
     useEffect(() => {
-        const totalIncome = transactions.reduce((acc, transaction) => acc + transaction.amount, 0);
+        const totalIncome = transactions.reduce(
+            (acc, transaction) => acc + transaction.netAmount,
+            0
+        );
         const totalIncomeFromTips = transactions.reduce((acc, transaction) => {
             if (transaction.type === "tip") {
-                return acc + transaction.amount;
+                return acc + transaction.netAmount;
             }
             return acc;
         }, 0);
@@ -61,9 +64,12 @@ export default function IncomeWidget({ userId }: { userId: string }) {
     }, [transactions, timePeriod]);
 
     useEffect(() => {
-        const currentTotal = transactions.reduce((acc, transaction) => acc + transaction.amount, 0);
+        const currentTotal = transactions.reduce(
+            (acc, transaction) => acc + transaction.netAmount,
+            0
+        );
         const previousTotal = previousTransactions.reduce(
-            (acc, transaction) => acc + transaction.amount,
+            (acc, transaction) => acc + transaction.netAmount,
             0
         );
 

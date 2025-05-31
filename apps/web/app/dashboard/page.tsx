@@ -62,10 +62,7 @@ export default async function Page() {
                     </DashboardGridItem>
 
                     <DashboardGridItem className="col-span-4">
-                        <RecentTransactionsWidget
-                            userId={user.id}
-                            stripeAcctID={profile.stripeAcctID ?? ""}
-                        />
+                        <RecentTransactionsWidget userId={user.id} />
                     </DashboardGridItem>
                 </DashboardGrid>
 

@@ -56,6 +56,9 @@ export async function createPaymentIntent(
         stripeId: pi.id,
         type: "tip",
         isCompleted: false,
+        netAmount: 0,
+        stripeFee: 0,
+        applicationFee: fee,
         message: metadata?.message || "No message",
         fromUserEmail: fromEmail
     });
@@ -99,11 +102,31 @@ export async function completeTransaction(transactionId: string): Promise<{
         };
     }
 
+    const profile = await getProfileByUserId(existingTransaction.toUserId || "");
+
+    const { balanceTransaction } = await getStripeTransaction(
+        transactionId,
+        profile?.stripeAcctID || ""
+    );
+
+    const netAmount = balanceTransaction.net;
+    const stripeFee = balanceTransaction.fee_details?.find(
+        (fee) => fee.type === "stripe_fee"
+    )?.amount;
+    const applicationFee = balanceTransaction.fee_details?.find(
+        (fee) => fee.type === "application_fee"
+    )?.amount;
+    const grossAmount = balanceTransaction.amount;
+
     // Only proceed with completion if not already completed
     const [updatedTransaction] = await db
         .update(transaction)
         .set({
+            amount: Number(grossAmount),
             isCompleted: true,
+            netAmount: Number(netAmount),
+            stripeFee: Number(stripeFee),
+            applicationFee: Number(applicationFee),
             updatedAt: new Date()
         })
         .where(eq(transaction.stripeId, transactionId))
@@ -112,8 +135,6 @@ export async function completeTransaction(transactionId: string): Promise<{
     if (!updatedTransaction) {
         throw new Error("Error completing transaction");
     }
-
-    const profile = await getProfileByUserId(updatedTransaction.toUserId);
 
     const p = await stripe.paymentIntents.retrieve(transactionId, {
         stripeAccount: profile?.stripeAcctID || undefined

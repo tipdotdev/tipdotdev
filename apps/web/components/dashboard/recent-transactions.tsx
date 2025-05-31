@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { getStripeDashboardLink, getStripeTransaction } from "@/actions/stripe";
+import { getStripeDashboardLink } from "@/actions/stripe";
 import { getRecentTransactions } from "@/actions/user";
 import { transaction } from "@/db/schema";
 import { InferSelectModel } from "drizzle-orm";
@@ -15,13 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Skeleton } from "../ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 
-export default function RecentTransactionsWidget({
-    userId,
-    stripeAcctID
-}: {
-    userId: string;
-    stripeAcctID: string;
-}) {
+export default function RecentTransactionsWidget({ userId }: { userId: string }) {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [transactions, setTransactions] = useState<InferSelectModel<typeof transaction>[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -29,8 +23,6 @@ export default function RecentTransactionsWidget({
         typeof transaction
     > | null>(null);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [charge, setCharge] = useState<any>(null);
-    const [balanceTransaction, setBalanceTransaction] = useState<any>(null);
     const transactionsPerPage = 10;
 
     useEffect(() => {
@@ -42,21 +34,6 @@ export default function RecentTransactionsWidget({
         };
         fetchTransactions();
     }, [userId]);
-
-    useEffect(() => {
-        if (selectedTransaction) {
-            const fetchPaymentIntent = async () => {
-                const { paymentIntent, charge, balanceTransaction } = await getStripeTransaction(
-                    selectedTransaction.stripeId,
-                    stripeAcctID
-                );
-                setCharge(charge);
-                setBalanceTransaction(balanceTransaction);
-                console.log(paymentIntent, charge, balanceTransaction);
-            };
-            fetchPaymentIntent();
-        }
-    }, [selectedTransaction, stripeAcctID]);
 
     // Calculate pagination
     const totalPages = Math.ceil(transactions.length / transactionsPerPage);
@@ -130,7 +107,8 @@ export default function RecentTransactionsWidget({
                                 <TableRow className="font-mono">
                                     <TableHead>From</TableHead>
                                     <TableHead>Type</TableHead>
-                                    <TableHead>Gross Amount</TableHead>
+                                    <TableHead>Net</TableHead>
+                                    <TableHead>Gross</TableHead>
                                     <TableHead>Message</TableHead>
                                     <TableHead>Date</TableHead>
                                 </TableRow>
@@ -173,6 +151,12 @@ export default function RecentTransactionsWidget({
                                                 </span>
                                             </TableCell>
                                             <TableCell className="font-bold">
+                                                {formatAmount(transaction.netAmount)}{" "}
+                                                <span className="text-xs font-normal text-muted-foreground">
+                                                    USD
+                                                </span>
+                                            </TableCell>
+                                            <TableCell className="font-normal">
                                                 {formatAmount(transaction.amount)}{" "}
                                                 <span className="text-xs font-normal text-muted-foreground">
                                                     USD
@@ -232,7 +216,7 @@ export default function RecentTransactionsWidget({
 
             {/* Transaction Detail Modal */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                {selectedTransaction && charge && balanceTransaction ? (
+                {selectedTransaction ? (
                     <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle className="flex flex-col items-start justify-center">
@@ -261,14 +245,14 @@ export default function RecentTransactionsWidget({
                                 </div>
                                 <div className="flex w-full flex-col items-start gap-2">
                                     <p className="text-3xl font-bold">
-                                        {formatAmount(selectedTransaction?.amount ?? 0)}{" "}
+                                        {formatAmount(selectedTransaction?.netAmount ?? 0)}{" "}
                                         <span className="text-sm font-normal text-muted-foreground">
                                             USD
                                         </span>
                                     </p>
                                     <p className="text-md font-semibold text-muted-foreground">
-                                        {formatAmount(balanceTransaction?.net ?? 0)}{" "}
-                                        <span className="text-sm font-normal">(After Fees)</span>
+                                        {formatAmount(selectedTransaction?.amount ?? 0)}{" "}
+                                        <span className="text-sm font-normal">(Before fees)</span>
                                     </p>
                                 </div>
                                 <p className="mt-2 text-sm font-normal text-muted-foreground">
@@ -344,82 +328,64 @@ export default function RecentTransactionsWidget({
                                             </Button>
                                         </div>
                                     </div>
-                                    <div>
-                                        <label className="text-sm font-medium text-muted-foreground">
-                                            Charge ID
-                                        </label>
-                                        <div className="mt-1 flex items-center gap-2">
-                                            <code className="max-w-[150px] truncate rounded bg-muted px-2 py-1 text-xs">
-                                                {charge.id}
-                                            </code>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => copyToClipboard(charge.id)}
-                                                className="h-6 w-6 p-0"
-                                            >
-                                                <Copy className="h-3 w-3" />
-                                            </Button>
+                                </div>
+                            </div>
+
+                            {/* Fee Breakdown */}
+                            <div className="border-t pt-4">
+                                <h4 className="mb-4 text-sm font-medium text-muted-foreground">
+                                    Fee Breakdown
+                                </h4>
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-muted-foreground">
+                                            Amount
+                                        </span>
+                                        <span className="text-sm font-medium">
+                                            {formatAmount(selectedTransaction.amount)}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-muted-foreground">
+                                            Processing fee
+                                        </span>
+                                        <span className="text-sm font-medium">
+                                            -
+                                            {formatAmount(
+                                                selectedTransaction.stripeFee +
+                                                    selectedTransaction.applicationFee
+                                            )}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center justify-between pl-4">
+                                        <span className="text-sm text-muted-foreground">
+                                            Stripe processing fee
+                                        </span>
+                                        <span className="text-sm text-muted-foreground">
+                                            -{formatAmount(selectedTransaction.stripeFee)}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center justify-between pl-4">
+                                        <span className="text-sm text-muted-foreground">
+                                            tip.dev fee (4.5%)
+                                        </span>
+                                        <span className="text-sm text-muted-foreground">
+                                            -{formatAmount(selectedTransaction.applicationFee)}
+                                        </span>
+                                    </div>
+
+                                    <div className="mt-3 border-t pt-3">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-lg font-medium">Net</span>
+                                            <span className="text-lg font-bold">
+                                                {formatAmount(selectedTransaction.netAmount)}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Fee Breakdown */}
-                                {balanceTransaction && (
-                                    <div className="border-t pt-4">
-                                        <h4 className="mb-4 text-sm font-medium text-muted-foreground">
-                                            Fee Breakdown
-                                        </h4>
-                                        <div className="space-y-3">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm text-muted-foreground">
-                                                    Amount
-                                                </span>
-                                                <span className="text-sm font-medium">
-                                                    {formatAmount(balanceTransaction.amount)}
-                                                </span>
-                                            </div>
-
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm text-muted-foreground">
-                                                    Processing fee
-                                                </span>
-                                                <span className="text-sm font-medium">
-                                                    -{formatAmount(balanceTransaction.fee)}
-                                                </span>
-                                            </div>
-
-                                            {balanceTransaction.fee_details?.map(
-                                                (fee: any, index: number) => (
-                                                    <div
-                                                        key={index}
-                                                        className="flex items-center justify-between pl-4"
-                                                    >
-                                                        <span className="text-sm text-muted-foreground">
-                                                            {fee.type === "stripe_fee"
-                                                                ? "Stripe processing fee"
-                                                                : fee.type === "application_fee"
-                                                                  ? "tip.dev fee (4.5%)"
-                                                                  : fee.description || fee.type}
-                                                        </span>
-                                                        <span className="text-sm text-muted-foreground">
-                                                            -{formatAmount(fee.amount)}
-                                                        </span>
-                                                    </div>
-                                                )
-                                            )}
-
-                                            <div className="mt-3 border-t pt-3">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-lg font-medium">Net</span>
-                                                    <span className="text-lg font-bold">
-                                                        {formatAmount(balanceTransaction.net)}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
 
                             {/* Message Section */}
