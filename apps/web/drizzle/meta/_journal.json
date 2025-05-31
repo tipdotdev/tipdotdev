@@ -43,6 +43,27 @@
       "when": 1748551520582,
       "tag": "0005_fresh_scorpion",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1748670011235,
+      "tag": "0006_broad_aaron_stack",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1748670333251,
+      "tag": "0007_jazzy_stingray",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1748670402233,
+      "tag": "0008_short_wolverine",
+      "breakpoints": true
     }
   ]
 }

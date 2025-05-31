@@ -1,0 +1,1 @@
+ALTER TABLE "transaction" ADD COLUMN "application_fee" integer;

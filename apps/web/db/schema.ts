@@ -81,10 +81,9 @@ export const transaction = pgTable("transaction", {
         .notNull()
         .references(() => user.id, { onDelete: "no action" }),
     amount: integer("amount").notNull(),
-    // TODO: migrate this
-    // applicationFee: integer("application_fee")
-    //     .$defaultFn(() => 0)
-    //     .notNull(),
+    applicationFee: integer("application_fee")
+        .$defaultFn(() => 0)
+        .notNull(),
     stripeId: text("stripe_id").notNull(),
     type: text("type").notNull(),
     isCompleted: boolean("is_completed")
@@ -97,5 +96,19 @@ export const transaction = pgTable("transaction", {
         .notNull(),
     updatedAt: timestamp("updated_at")
         .$defaultFn(() => /* @__PURE__ */ new Date())
+        .notNull()
+});
+
+export const waitlist = pgTable("waitlist", {
+    id: serial("id").primaryKey(),
+    email: text("email").notNull().unique(),
+    createdAt: timestamp("created_at")
+        .$defaultFn(() => /* @__PURE__ */ new Date())
+        .notNull(),
+    updatedAt: timestamp("updated_at")
+        .$defaultFn(() => /* @__PURE__ */ new Date())
+        .notNull(),
+    isSubscribed: boolean("is_subscribed")
+        .$defaultFn(() => true)
         .notNull()
 });

@@ -1,0 +1,1 @@
+ALTER TABLE "transaction" ALTER COLUMN "application_fee" SET NOT NULL;
