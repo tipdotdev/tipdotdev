@@ -5,6 +5,7 @@ import { profile } from "@/db/schema";
 import { auth } from "@/utils/auth";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
+import { createNotificationPreferences } from "./notifications";
 
 export async function checkUsernameAvailability(username: string): Promise<boolean> {
     // Normalize username: trim whitespace and convert to lowercase
@@ -60,6 +61,9 @@ export async function insertUsername(username: string) {
         console.error("Error setting username:", error);
         throw new Error("Error setting username");
     }
+
+    // create the notification preferences
+    await createNotificationPreferences(session.user.id);
 }
 
 export async function getSelfProfile() {

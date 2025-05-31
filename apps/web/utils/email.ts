@@ -1,3 +1,4 @@
+import { getNotificationPreferencesByEmail } from "@/actions/notifications";
 import MagicLinkTemplate from "@/emails/magic-link-template";
 import TipReceiptEmail from "@/emails/tip-reciept-template";
 import TipReceivedEmail from "@/emails/tip-recieved-template";
@@ -79,7 +80,6 @@ interface TipReceiptEmail {
 }
 
 export async function sendTipReceipts(data: TipReceiptEmail): Promise<EmailResponse> {
-    // TODO: implement reciever email stuff
     const formattedDate = new Date(data.date).toLocaleString("en-US", {
         month: "long",
         day: "numeric",
@@ -161,12 +161,15 @@ export async function sendTipReceipts(data: TipReceiptEmail): Promise<EmailRespo
         };
     }
 
-    const recieverEmailRes = await ses.sendEmail(recieverEmailParams);
-    if (recieverEmailRes.$metadata.httpStatusCode !== 200) {
-        return {
-            success: false,
-            error: `Failed to send tip notification: ${recieverEmailRes.$metadata.httpStatusCode}`
-        };
+    const notifPrefs = await getNotificationPreferencesByEmail(data.recieverEmail);
+    if (notifPrefs?.emailOnTip) {
+        const recieverEmailRes = await ses.sendEmail(recieverEmailParams);
+        if (recieverEmailRes.$metadata.httpStatusCode !== 200) {
+            return {
+                success: false,
+                error: `Failed to send tip notification: ${recieverEmailRes.$metadata.httpStatusCode}`
+            };
+        }
     }
 
     return {

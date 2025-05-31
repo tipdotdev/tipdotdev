@@ -112,3 +112,18 @@ export const waitlist = pgTable("waitlist", {
         .$defaultFn(() => true)
         .notNull()
 });
+
+export const notificationPreferences = pgTable("notification_preferences", {
+    id: serial("id").primaryKey(),
+    userId: text("user_id")
+        .notNull()
+        .unique()
+        .references(() => user.id, { onDelete: "cascade" }),
+    emailOnTip: boolean("email_on_tip").notNull().default(true),
+    createdAt: timestamp("created_at")
+        .$defaultFn(() => /* @__PURE__ */ new Date())
+        .notNull(),
+    updatedAt: timestamp("updated_at")
+        .$defaultFn(() => /* @__PURE__ */ new Date())
+        .notNull()
+});

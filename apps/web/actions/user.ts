@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { transaction } from "@/db/schema";
+import { transaction, user } from "@/db/schema";
 import { auth } from "@/utils/auth";
 import { and, count, desc, eq } from "drizzle-orm";
 import { headers } from "next/headers";
@@ -32,4 +32,10 @@ export async function getSupporterCount(userId: string) {
         .groupBy(transaction.fromUserEmail);
 
     return supporters.length;
+}
+
+export async function getUserByEmail(email: string) {
+    const userData = await db.select().from(user).where(eq(user.email, email));
+
+    return userData[0];
 }
