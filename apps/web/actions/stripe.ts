@@ -191,3 +191,19 @@ export async function getStripeAccountSession(userId: string) {
 
     return session.client_secret;
 }
+
+export async function getStripeTransaction(paymentIntentId: string, stripeAcctID: string) {
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId, {
+        stripeAccount: stripeAcctID
+    });
+    const charge = await stripe.charges.retrieve(paymentIntent.latest_charge as string, {
+        stripeAccount: stripeAcctID
+    });
+    const balanceTransaction = await stripe.balanceTransactions.retrieve(
+        charge.balance_transaction as string,
+        {
+            stripeAccount: stripeAcctID
+        }
+    );
+    return { paymentIntent, charge, balanceTransaction };
+}

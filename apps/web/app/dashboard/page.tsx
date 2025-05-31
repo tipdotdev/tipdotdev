@@ -2,7 +2,9 @@ import { getSelfProfile } from "@/actions/profile";
 import AccountDropdown from "@/components/dashboard/account-dropdown";
 import DashboardGrid, { DashboardGridItem } from "@/components/dashboard/grid";
 import { WelcomeBack } from "@/components/dashboard/home";
-import { StripeDashboard } from "@/components/dashboard/stripe-dashboard";
+import IncomeWidget from "@/components/dashboard/income-widget";
+import RecentTransactionsWidget from "@/components/dashboard/recent-transactions";
+import SupportersWidget from "@/components/dashboard/supporters-widget";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -50,9 +52,24 @@ export default async function Page() {
                     <DashboardGridItem className="col-span-4">
                         <WelcomeBack profile={profile} user={user} />
                     </DashboardGridItem>
+
+                    <DashboardGridItem className="col-span-4 md:col-span-2">
+                        <IncomeWidget userId={user.id} />
+                    </DashboardGridItem>
+
+                    <DashboardGridItem className="col-span-4 md:col-span-2">
+                        <SupportersWidget userId={user.id} />
+                    </DashboardGridItem>
+
+                    <DashboardGridItem className="col-span-4">
+                        <RecentTransactionsWidget
+                            userId={user.id}
+                            stripeAcctID={profile.stripeAcctID ?? ""}
+                        />
+                    </DashboardGridItem>
                 </DashboardGrid>
 
-                <StripeDashboard userId={user.id} />
+                {/* <StripeDashboard userId={user.id} /> */}
             </section>
         </div>
     );
