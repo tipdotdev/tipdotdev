@@ -22,7 +22,14 @@ export async function sendMagicLink(
     url: string,
     token: string
 ): Promise<EmailResponse> {
-    const emailHTML = await render(MagicLinkTemplate({ url, token }));
+    const date = new Date().toLocaleString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+    const emailHTML = await render(MagicLinkTemplate({ url, token, email, date }));
     const params: SendEmailCommandInput = {
         Source: fromEmail,
         Destination: {
