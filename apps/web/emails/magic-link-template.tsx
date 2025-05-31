@@ -11,6 +11,10 @@ import {
     Section,
     Text
 } from "@react-email/components";
+import { container, footer, footerSmall, footerText, main, securityLink } from "./common-styles";
+import { WarningAlert } from "./components/alert";
+import { EmailTerminalFooter } from "./components/footer";
+import { EmailHeader } from "./components/header";
 
 interface MagicLinkTemplateProps {
     url: string;
@@ -26,17 +30,7 @@ export const MagicLinkTemplate = ({ url, token, email, date }: MagicLinkTemplate
         <Body style={main}>
             <Container style={container}>
                 {/* Header */}
-                <Section style={header}>
-                    <Row>
-                        <Column>
-                            <Text style={headerTitle}>{"{$}"} tip&#8203;.dev</Text>
-                            <Text style={headerSubtitle}>{"> authentication_request"}</Text>
-                        </Column>
-                        <Column style={headerRight}>
-                            <Text style={signInBadge}>SIGN IN</Text>
-                        </Column>
-                    </Row>
-                </Section>
+                <EmailHeader badgeLabel="SIGN IN" title="magic_link" />
 
                 {/* Welcome Message */}
                 <Section style={contentSection}>
@@ -74,21 +68,10 @@ export const MagicLinkTemplate = ({ url, token, email, date }: MagicLinkTemplate
                     </Section>
 
                     {/* Security Notice */}
-                    <Section style={securitySection}>
-                        <Row style={securityRow}>
-                            <Column style={iconColumn}>
-                                <Text style={warningIcon}>⚠️</Text>
-                            </Column>
-                            <Column>
-                                <Text style={securityTitle}>Security Notice</Text>
-                                <Text style={securityText}>
-                                    This sign-in link and verification code will expire in{" "}
-                                    <strong>5 minutes</strong>. Never share this email or code with
-                                    anyone. tip.dev will never ask for your security info via email.
-                                </Text>
-                            </Column>
-                        </Row>
-                    </Section>
+                    <WarningAlert
+                        title="Security Notice"
+                        message="This sign-in link and verification code will expire in 5 minutes. Never share this email or code with anyone. tip.dev will never ask for your security info via email."
+                    />
 
                     {/* Account Info */}
                     <Section style={accountSection}>
@@ -114,10 +97,10 @@ export const MagicLinkTemplate = ({ url, token, email, date }: MagicLinkTemplate
                 </Section>
 
                 {/* Terminal Footer */}
-                <Section style={terminalFooter}>
-                    <Text style={terminalText}>{">"} tip&#8203;.dev --auth --secure</Text>
-                    <Text style={terminalSubtext}>{"> welcome_back_developer()"}</Text>
-                </Section>
+                <EmailTerminalFooter
+                    text="tip&#8203;.dev --auth --secure"
+                    subtext="welcome_back_developer()"
+                />
             </Container>
         </Body>
     </Html>
@@ -133,57 +116,6 @@ MagicLinkTemplate.PreviewProps = {
 export default MagicLinkTemplate;
 
 // Styles
-const main = {
-    backgroundColor: "#f9fafb",
-    fontFamily: "system-ui, sans-serif"
-};
-
-const container = {
-    backgroundColor: "#ffffff",
-    margin: "0 auto",
-    maxWidth: "600px",
-    borderRadius: "8px",
-    overflow: "hidden",
-    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)"
-};
-
-const header = {
-    backgroundColor: "#000000",
-    padding: "24px"
-};
-
-const headerTitle = {
-    color: "#ffffff !important",
-    fontSize: "24px",
-    fontWeight: "bold",
-    fontFamily: "monospace",
-    margin: "0 0 4px 0",
-    textDecoration: "none !important"
-};
-
-const headerSubtitle = {
-    color: "#d1d5db",
-    fontSize: "14px",
-    fontFamily: "monospace",
-    margin: "0"
-};
-
-const headerRight = {
-    textAlign: "right" as const
-};
-
-const signInBadge = {
-    backgroundColor: "#ffffff",
-    color: "#000000",
-    padding: "4px 12px",
-    borderRadius: "4px",
-    fontSize: "14px",
-    fontWeight: "bold",
-    fontFamily: "monospace",
-    display: "inline-block",
-    margin: "0"
-};
-
 const contentSection = {
     padding: "24px"
 };
@@ -269,42 +201,6 @@ const tokenValue = {
     margin: "0"
 };
 
-const iconColumn = {
-    width: "24px",
-    paddingRight: "12px"
-};
-
-const securitySection = {
-    backgroundColor: "#fefce8",
-    border: "1px solid #fde047",
-    borderRadius: "8px",
-    padding: "16px",
-    marginBottom: "24px"
-};
-
-const securityRow = {
-    verticalAlign: "top"
-};
-
-const warningIcon = {
-    fontSize: "20px",
-    margin: "0"
-};
-
-const securityTitle = {
-    color: "#92400e",
-    fontSize: "16px",
-    fontWeight: "600",
-    margin: "0 0 4px 0"
-};
-
-const securityText = {
-    color: "#a16207",
-    fontSize: "14px",
-    lineHeight: "1.5",
-    margin: "0"
-};
-
 const accountSection = {
     border: "1px solid #e5e7eb",
     borderRadius: "8px",
@@ -322,47 +218,4 @@ const accountDetail = {
     color: "#6b7280",
     fontSize: "14px",
     margin: "0 0 4px 0"
-};
-
-const footer = {
-    backgroundColor: "#f9fafb",
-    padding: "16px 24px",
-    textAlign: "center" as const
-};
-
-const footerText = {
-    color: "#6b7280",
-    fontSize: "14px",
-    margin: "0 0 8px 0"
-};
-
-const securityLink = {
-    color: "#dc2626",
-    textDecoration: "none"
-};
-
-const footerSmall = {
-    color: "#9ca3af",
-    fontSize: "12px",
-    margin: "0"
-};
-
-const terminalFooter = {
-    backgroundColor: "#000000",
-    padding: "16px",
-    textAlign: "center" as const
-};
-
-const terminalText = {
-    color: "#ffffff",
-    fontSize: "14px",
-    fontFamily: "monospace",
-    margin: "0 0 4px 0"
-};
-
-const terminalSubtext = {
-    color: "#d1d5db",
-    fontSize: "14px",
-    fontFamily: "monospace",
-    margin: "0"
 };

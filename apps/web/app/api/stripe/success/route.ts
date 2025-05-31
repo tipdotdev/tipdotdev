@@ -1,5 +1,7 @@
+import { getProfileByUserId } from "@/actions/profile";
 import { completeTransaction } from "@/actions/stripe";
 import { getSelfUser } from "@/actions/user";
+import { sendTipReceipts } from "@/utils/email";
 
 export async function POST(request: Request) {
     try {
@@ -12,17 +14,38 @@ export async function POST(request: Request) {
             });
         }
 
+        const profile = await getProfileByUserId(user.id);
+
         // get the payment intent id from the request body
         const { payment_intent } = await request.json();
 
         // complete the transaction
-        const { success } = await completeTransaction(payment_intent);
+        const { success, transaction, paymentMethod } = await completeTransaction(payment_intent);
 
         if (!success) {
             return new Response(JSON.stringify({ error: "Transaction failed" }), {
                 status: 400,
                 headers: { "Content-Type": "application/json" }
             });
+        }
+
+        // send the tip emails
+        const { success: senderEmailSuccess } = await sendTipReceipts({
+            senderEmail: transaction.fromUserEmail || "",
+            recieverEmail: user.email,
+            recieverUsername: profile?.username || "",
+            recieverAvatar: profile?.avatarUrl || "",
+            recieverBio: undefined,
+            message: transaction.message || undefined,
+            amount: transaction.amount,
+            processingFee: 0,
+            date: new Date().toISOString(),
+            tipId: transaction.id.toString(),
+            paymentMethod: paymentMethod || ""
+        });
+
+        if (!senderEmailSuccess) {
+            console.log("Failed to send tip receipt", senderEmailSuccess);
         }
 
         // return a 200 status

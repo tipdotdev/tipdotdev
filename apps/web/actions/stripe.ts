@@ -8,6 +8,8 @@ import { Stripe } from "stripe";
 import { getProfileByStripeAcctID, getProfileByUserId } from "./profile";
 import { getSelfUser } from "./user";
 
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { typescript: true });
+
 export async function createPaymentIntent(
     amount: number,
     toAcctID: string,
@@ -15,10 +17,6 @@ export async function createPaymentIntent(
     fromAcctID?: string,
     metadata?: Record<string, string>
 ): Promise<PaymentIntentSimple> {
-    console.log("createPaymentIntent called with fromEmail:", fromEmail);
-
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { typescript: true });
-
     const fee = Math.round(amount * 100 * 0.045);
 
     const paymentIntentData = {
@@ -29,15 +27,10 @@ export async function createPaymentIntent(
         metadata: metadata
     };
 
-    console.log("PaymentIntent data being sent to Stripe:", paymentIntentData);
-    console.log("Stripe account ID:", toAcctID);
-
     // Create the payment intent
     const pi = await stripe.paymentIntents.create(paymentIntentData, {
         stripeAccount: toAcctID
     });
-
-    console.log("Created PaymentIntent ID:", pi.id, "with receipt_email:", pi.receipt_email);
 
     // get the user id from the toAcctID
     const user = await getProfileByStripeAcctID(toAcctID);
@@ -79,35 +72,37 @@ export async function createPaymentIntent(
     };
 }
 
-export async function completeTransaction(transactionId: string): Promise<{ success: boolean }> {
-    console.log("Completing transaction with ID:", transactionId);
-
-    // First, let's see what transaction we're updating
-    const existingTransaction = await db
-        .select()
-        .from(transaction)
-        .where(eq(transaction.stripeId, transactionId));
-
-    console.log("Existing transaction before update:", existingTransaction);
-
-    const { error } = await db
+export async function completeTransaction(transactionId: string): Promise<{
+    success: boolean;
+    transaction: typeof transaction.$inferSelect;
+    paymentMethod: string | null;
+}> {
+    const [updatedTransaction] = await db
         .update(transaction)
         .set({
             isCompleted: true,
             updatedAt: new Date()
         })
-        .where(eq(transaction.stripeId, transactionId));
+        .where(eq(transaction.stripeId, transactionId))
+        .returning();
 
-    console.error(error);
-
-    if (error) {
+    if (!updatedTransaction) {
         throw new Error("Error completing transaction");
     }
 
-    // later we will email the user and the creator of the transaction
+    const profile = await getProfileByUserId(updatedTransaction.toUserId);
+
+    const p = await stripe.paymentIntents.retrieve(transactionId, {
+        stripeAccount: profile?.stripeAcctID || undefined
+    });
+    const pm = await stripe.paymentMethods.retrieve(p.payment_method?.toString() || "", {
+        stripeAccount: profile?.stripeAcctID || undefined
+    });
 
     return {
-        success: true
+        transaction: updatedTransaction,
+        success: true,
+        paymentMethod: pm.type === "card" ? (pm.card?.last4 ?? null) : (pm.type?.toString() ?? null)
     };
 }
 
