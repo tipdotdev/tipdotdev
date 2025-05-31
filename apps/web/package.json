@@ -8,7 +8,9 @@
         "start": "next start",
         "lint": "next lint",
         "ui:add": "bunx shadcn@latest add",
-        "email:dev": "email dev"
+        "email:dev": "email dev",
+        "db:generate": "drizzle-kit generate",
+        "db:migrate": "drizzle-kit migrate"
     },
     "dependencies": {
         "@aws-sdk/client-ses": "^3.821.0",

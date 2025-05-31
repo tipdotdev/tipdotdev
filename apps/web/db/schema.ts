@@ -81,6 +81,10 @@ export const transaction = pgTable("transaction", {
         .notNull()
         .references(() => user.id, { onDelete: "no action" }),
     amount: integer("amount").notNull(),
+    // TODO: migrate this
+    // applicationFee: integer("application_fee")
+    //     .$defaultFn(() => 0)
+    //     .notNull(),
     stripeId: text("stripe_id").notNull(),
     type: text("type").notNull(),
     isCompleted: boolean("is_completed")
