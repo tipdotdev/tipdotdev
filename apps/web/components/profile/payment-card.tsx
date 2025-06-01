@@ -18,7 +18,7 @@ import StripeCard from "./stripe-card";
 const formSchema = z.object({
     amount: z.number().int().positive().min(3).max(1000),
     email: z.string().email(),
-    message: z.string().max(1000).optional()
+    message: z.string().max(500).optional()
 });
 
 export default function PaymentCard({
@@ -145,6 +145,7 @@ export default function PaymentCard({
                                             <Textarea
                                                 placeholder="Message (optional)"
                                                 className="h-32 resize-none"
+                                                maxLength={500}
                                                 {...field}
                                             />
                                         </FormControl>
