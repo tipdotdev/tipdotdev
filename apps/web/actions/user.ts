@@ -19,22 +19,22 @@ export async function getRecentTransactions(userId: string, timePeriod: string) 
 
     switch (timePeriod) {
         case "Today":
-            dateCondition = gte(transaction.createdAt, sql`CURRENT_DATE`);
+            dateCondition = gte(transaction.createdAt, sql`NOW() - INTERVAL '24 hours'`);
             break;
         case "Past-7-days":
-            dateCondition = gte(transaction.createdAt, sql`CURRENT_DATE - INTERVAL '7 days'`);
+            dateCondition = gte(transaction.createdAt, sql`NOW() - INTERVAL '7 days'`);
             break;
         case "Past-30-days":
-            dateCondition = gte(transaction.createdAt, sql`CURRENT_DATE - INTERVAL '30 days'`);
+            dateCondition = gte(transaction.createdAt, sql`NOW() - INTERVAL '30 days'`);
             break;
         case "Past-90-days":
-            dateCondition = gte(transaction.createdAt, sql`CURRENT_DATE - INTERVAL '90 days'`);
+            dateCondition = gte(transaction.createdAt, sql`NOW() - INTERVAL '90 days'`);
             break;
         case "Past-180-days":
-            dateCondition = gte(transaction.createdAt, sql`CURRENT_DATE - INTERVAL '180 days'`);
+            dateCondition = gte(transaction.createdAt, sql`NOW() - INTERVAL '180 days'`);
             break;
         case "Past-365-days":
-            dateCondition = gte(transaction.createdAt, sql`CURRENT_DATE - INTERVAL '365 days'`);
+            dateCondition = gte(transaction.createdAt, sql`NOW() - INTERVAL '365 days'`);
             break;
         case "All-time":
         default:
@@ -63,46 +63,34 @@ export async function getPreviousPeriodTransactions(userId: string, timePeriod: 
 
     switch (timePeriod) {
         case "Today":
-            startDateCondition = gte(transaction.createdAt, sql`CURRENT_DATE - INTERVAL '1 day'`);
-            endDateCondition = sql`${transaction.createdAt} < CURRENT_DATE`;
+            startDateCondition = gte(transaction.createdAt, sql`NOW() - INTERVAL '48 hours'`);
+            endDateCondition = sql`${transaction.createdAt} < NOW() - INTERVAL '24 hours'`;
             break;
         case "Past-7-days":
-            startDateCondition = gte(transaction.createdAt, sql`CURRENT_DATE - INTERVAL '14 days'`);
-            endDateCondition = sql`${transaction.createdAt} < CURRENT_DATE - INTERVAL '7 days'`;
+            startDateCondition = gte(transaction.createdAt, sql`NOW() - INTERVAL '14 days'`);
+            endDateCondition = sql`${transaction.createdAt} < NOW() - INTERVAL '7 days'`;
             break;
         case "Past-30-days":
-            startDateCondition = gte(transaction.createdAt, sql`CURRENT_DATE - INTERVAL '60 days'`);
-            endDateCondition = sql`${transaction.createdAt} < CURRENT_DATE - INTERVAL '30 days'`;
+            startDateCondition = gte(transaction.createdAt, sql`NOW() - INTERVAL '60 days'`);
+            endDateCondition = sql`${transaction.createdAt} < NOW() - INTERVAL '30 days'`;
             break;
         case "Past-90-days":
-            startDateCondition = gte(
-                transaction.createdAt,
-                sql`CURRENT_DATE - INTERVAL '180 days'`
-            );
-            endDateCondition = sql`${transaction.createdAt} < CURRENT_DATE - INTERVAL '90 days'`;
+            startDateCondition = gte(transaction.createdAt, sql`NOW() - INTERVAL '180 days'`);
+            endDateCondition = sql`${transaction.createdAt} < NOW() - INTERVAL '90 days'`;
             break;
         case "Past-180-days":
-            startDateCondition = gte(
-                transaction.createdAt,
-                sql`CURRENT_DATE - INTERVAL '360 days'`
-            );
-            endDateCondition = sql`${transaction.createdAt} < CURRENT_DATE - INTERVAL '180 days'`;
+            startDateCondition = gte(transaction.createdAt, sql`NOW() - INTERVAL '360 days'`);
+            endDateCondition = sql`${transaction.createdAt} < NOW() - INTERVAL '180 days'`;
             break;
         case "Past-365-days":
-            startDateCondition = gte(
-                transaction.createdAt,
-                sql`CURRENT_DATE - INTERVAL '730 days'`
-            );
-            endDateCondition = sql`${transaction.createdAt} < CURRENT_DATE - INTERVAL '365 days'`;
+            startDateCondition = gte(transaction.createdAt, sql`NOW() - INTERVAL '730 days'`);
+            endDateCondition = sql`${transaction.createdAt} < NOW() - INTERVAL '365 days'`;
             break;
         case "All-time":
         default:
             // For all-time, compare to same period last year
-            startDateCondition = gte(
-                transaction.createdAt,
-                sql`CURRENT_DATE - INTERVAL '730 days'`
-            );
-            endDateCondition = sql`${transaction.createdAt} < CURRENT_DATE - INTERVAL '365 days'`;
+            startDateCondition = gte(transaction.createdAt, sql`NOW() - INTERVAL '730 days'`);
+            endDateCondition = sql`${transaction.createdAt} < NOW() - INTERVAL '365 days'`;
             break;
     }
 
