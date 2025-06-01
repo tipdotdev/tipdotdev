@@ -14,7 +14,7 @@ export function DashboardGridItem({
     return (
         <div
             className={cn(
-                "col-span-1 h-full w-full rounded-lg border border-sidebar-border bg-sidebar p-4",
+                "col-span-1 h-fit w-full rounded-lg border border-sidebar-border bg-sidebar p-4",
                 className
             )}
         >

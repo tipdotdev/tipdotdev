@@ -1,5 +1,10 @@
+import { getNotificationPreferences } from "@/actions/notifications";
 import { getSelfProfile } from "@/actions/profile";
+import { AvatarBannerWidget } from "@/components/dashboard/avatar-banner-widget";
 import DashboardGrid, { DashboardGridItem } from "@/components/dashboard/grid";
+import { PersonalInfoWidget } from "@/components/dashboard/personal-info-widget";
+import { ProfileSettingsWidget } from "@/components/dashboard/profile-settings-widget";
+import { SocialMediaWidget } from "@/components/dashboard/social-media-widget";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -27,6 +32,8 @@ export default async function Page() {
         redirect("/onboarding/username");
     }
 
+    const notificationPreferences = await getNotificationPreferences(user.id);
+
     return (
         <div className="flex min-h-screen flex-col items-center justify-center font-normal">
             <section className="relative mt-1 flex h-full w-full flex-col items-start justify-start px-4 py-4">
@@ -46,8 +53,23 @@ export default async function Page() {
                     </BreadcrumbList>
                 </Breadcrumb>
                 <DashboardGrid>
-                    <DashboardGridItem className="col-span-4">
-                        <></>
+                    <DashboardGridItem className="col-span-4 md:col-span-2">
+                        <PersonalInfoWidget profile={profile} />
+                    </DashboardGridItem>
+
+                    <DashboardGridItem className="col-span-4 md:col-span-2">
+                        <AvatarBannerWidget profile={profile} />
+                    </DashboardGridItem>
+
+                    <DashboardGridItem className="col-span-4 md:col-span-2">
+                        <SocialMediaWidget profile={profile} />
+                    </DashboardGridItem>
+
+                    <DashboardGridItem className="col-span-4 md:col-span-2">
+                        <ProfileSettingsWidget
+                            profile={profile}
+                            notificationPreferences={notificationPreferences}
+                        />
                     </DashboardGridItem>
                 </DashboardGrid>
             </section>

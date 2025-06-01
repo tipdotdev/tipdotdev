@@ -10,7 +10,6 @@ import TwitterLogo from "@/public/icons/twitter.svg";
 import { auth } from "@/utils/auth";
 import { LinkIcon, ShareIcon } from "lucide-react";
 import { headers } from "next/headers";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -37,7 +36,10 @@ export default async function Page({ params }: Props) {
         <div className="flex min-h-screen flex-col items-center justify-start font-normal">
             <section className="relative mt-1 flex h-full w-full flex-col items-center justify-start px-4 py-4">
                 <div className="flex w-full max-w-full flex-col items-center justify-center gap-2 md:max-w-5xl">
-                    <Banner src={""} alt={profile.username + "'s banner on tip.dev"} />
+                    <Banner
+                        src={profile.bannerUrl || ""}
+                        alt={profile.username + "'s banner on tip.dev"}
+                    />
                     <div className="-mt-4 flex w-full flex-row items-center justify-between gap-4">
                         <div className="flex items-center justify-center gap-4">
                             <Avatar className="h-24 w-24 border-[6px] border-background">
@@ -95,10 +97,8 @@ export default async function Page({ params }: Props) {
 
 function Banner({ src, alt }: { src: string; alt: string }) {
     return (
-        <div className="relative h-52 w-full rounded-lg bg-muted">
-            {src && (
-                <Image src={src} alt={alt} layout="fill" objectFit="cover" className="rounded-lg" />
-            )}
+        <div className="relative aspect-[4/1] w-full overflow-hidden rounded-lg bg-muted">
+            {src && <img src={src} alt={alt} className="h-full w-full object-cover" />}
         </div>
     );
 }

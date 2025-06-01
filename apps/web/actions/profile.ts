@@ -2,10 +2,11 @@
 
 import { db } from "@/db";
 import { profile } from "@/db/schema";
+import { deleteUploadThingFile } from "@/lib/uploadthing";
 import { auth } from "@/utils/auth";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import { createNotificationPreferences } from "./notifications";
+import { createNotificationPreferences, updateNotificationPreferences } from "./notifications";
 
 export async function checkUsernameAvailability(username: string): Promise<boolean> {
     // Normalize username: trim whitespace and convert to lowercase
@@ -106,4 +107,222 @@ export async function getProfileByStripeAcctID(stripeAcctID: string) {
     }
 
     return data[0];
+}
+
+export async function updateProfilePersonalInfo(
+    userId: string,
+    displayName: string,
+    bio: string,
+    website: string
+): Promise<{ success: boolean; error: string | null }> {
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    if (!session) {
+        throw new Error("User not authenticated");
+    }
+
+    const { error } = await db
+        .update(profile)
+        .set({
+            displayName: displayName,
+            bio: bio,
+            website: website
+        })
+        .where(eq(profile.userId, userId));
+
+    if (error) {
+        console.error("Error updating profile:", error);
+        throw new Error("Error updating profile");
+    }
+
+    return { success: true, error: null };
+}
+
+export async function updateProfileSocialMedia(
+    userId: string,
+    twitter: string,
+    github: string,
+    instagram: string
+): Promise<{ success: boolean; error: string | null }> {
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    if (!session) {
+        throw new Error("User not authenticated");
+    }
+
+    const socialMediaData = {
+        twitter: twitter || null,
+        github: github || null,
+        instagram: instagram || null
+    };
+
+    const { error } = await db
+        .update(profile)
+        .set({
+            socialMedia: socialMediaData
+        })
+        .where(eq(profile.userId, userId));
+
+    if (error) {
+        console.error("Error updating profile social media:", error);
+        throw new Error("Error updating profile social media");
+    }
+
+    return { success: true, error: null };
+}
+
+export async function updateProfileSettings(
+    userId: string,
+    showTips: boolean,
+    allowTips: boolean,
+    emailOnTip: boolean
+): Promise<{ success: boolean; error: string | null }> {
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    if (!session) {
+        throw new Error("User not authenticated");
+    }
+
+    try {
+        // Update profile settings
+        const { error: profileError } = await db
+            .update(profile)
+            .set({
+                showTips: showTips,
+                allowTips: allowTips
+            })
+            .where(eq(profile.userId, userId));
+
+        if (profileError) {
+            console.error("Error updating profile settings:", profileError);
+            throw new Error("Error updating profile settings");
+        }
+
+        // Update notification preferences
+        const notificationResult = await updateNotificationPreferences(userId, {
+            emailOnTip: emailOnTip
+        });
+
+        if (!notificationResult) {
+            console.error("Error updating notification preferences");
+            throw new Error("Error updating notification preferences");
+        }
+
+        return { success: true, error: null };
+    } catch (error) {
+        console.error("Error updating profile settings:", error);
+        return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+    }
+}
+
+export async function updateProfileAvatar(
+    userId: string,
+    avatarUrl: string | null
+): Promise<{ success: boolean; error: string | null }> {
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    if (!session) {
+        throw new Error("User not authenticated");
+    }
+
+    try {
+        // If removing avatar (setting to null), delete the existing file from UploadThing first
+        if (avatarUrl === null) {
+            const currentProfile = await db
+                .select({ avatarKey: profile.avatarKey })
+                .from(profile)
+                .where(eq(profile.userId, userId))
+                .limit(1);
+
+            if (currentProfile[0]?.avatarKey) {
+                const deleteResult = await deleteUploadThingFile(currentProfile[0].avatarKey);
+                if (!deleteResult.success) {
+                    console.warn(
+                        "Failed to delete old avatar from UploadThing:",
+                        deleteResult.error
+                    );
+                    // Continue with database update even if file deletion fails
+                }
+            }
+        }
+
+        const { error } = await db
+            .update(profile)
+            .set({
+                avatarUrl: avatarUrl,
+                avatarKey: avatarUrl === null ? null : undefined // Clear key when removing, keep existing when updating
+            })
+            .where(eq(profile.userId, userId));
+
+        if (error) {
+            console.error("Error updating profile avatar:", error);
+            throw new Error("Error updating profile avatar");
+        }
+
+        return { success: true, error: null };
+    } catch (error) {
+        console.error("Error updating profile avatar:", error);
+        return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+    }
+}
+
+export async function updateProfileBanner(
+    userId: string,
+    bannerUrl: string | null
+): Promise<{ success: boolean; error: string | null }> {
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    if (!session) {
+        throw new Error("User not authenticated");
+    }
+
+    try {
+        // If removing banner (setting to null), delete the existing file from UploadThing first
+        if (bannerUrl === null) {
+            const currentProfile = await db
+                .select({ bannerKey: profile.bannerKey })
+                .from(profile)
+                .where(eq(profile.userId, userId))
+                .limit(1);
+
+            if (currentProfile[0]?.bannerKey) {
+                const deleteResult = await deleteUploadThingFile(currentProfile[0].bannerKey);
+                if (!deleteResult.success) {
+                    console.warn(
+                        "Failed to delete old banner from UploadThing:",
+                        deleteResult.error
+                    );
+                    // Continue with database update even if file deletion fails
+                }
+            }
+        }
+
+        const { error } = await db
+            .update(profile)
+            .set({
+                bannerUrl: bannerUrl,
+                bannerKey: bannerUrl === null ? null : undefined // Clear key when removing, keep existing when updating
+            })
+            .where(eq(profile.userId, userId));
+
+        if (error) {
+            console.error("Error updating profile banner:", error);
+            throw new Error("Error updating profile banner");
+        }
+
+        return { success: true, error: null };
+    } catch (error) {
+        console.error("Error updating profile banner:", error);
+        return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+    }
 }

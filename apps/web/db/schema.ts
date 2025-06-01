@@ -1,4 +1,4 @@
-import { boolean, integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, integer, jsonb, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
     id: text("id").primaryKey(),
@@ -63,9 +63,20 @@ export const profile = pgTable("profile", {
         .notNull()
         .references(() => user.id, { onDelete: "cascade" }),
     username: text("username").notNull().unique(),
+    displayName: text("display_name"),
     avatarUrl: text("avatar_url"),
+    bannerUrl: text("banner_url"),
+    bannerKey: text("banner_key"),
+    avatarKey: text("avatar_key"),
     bio: text("bio"),
     website: text("website"),
+    socialMedia: jsonb("social_media").$defaultFn(() => ({
+        twitter: null,
+        github: null,
+        instagram: null
+    })),
+    showTips: boolean("show_tips").default(true),
+    allowTips: boolean("allow_tips").default(true),
     stripeAcctID: text("stripe_acct_id"),
     stripeConnected: boolean("stripe_connected")
         .$defaultFn(() => false)
