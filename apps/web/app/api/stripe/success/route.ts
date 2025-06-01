@@ -19,6 +19,10 @@ export async function POST(request: Request) {
         // get the payment intent id from the request body
         const { payment_intent } = await request.json();
 
+        // Add a delay to ensure Stripe has fully processed the payment
+        // This helps prevent the balance_transaction null error
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+
         // complete the transaction
         const { success, transaction, paymentMethod, alreadyProcessed } =
             await completeTransaction(payment_intent);

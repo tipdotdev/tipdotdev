@@ -17,14 +17,36 @@ export async function createPaymentIntent(
     fromAcctID?: string,
     metadata?: Record<string, string>
 ): Promise<PaymentIntentSimple> {
-    const fee = Math.round(amount * 100 * 0.045);
+    // Check if user is covering the fee
+    const isCoveringFee = metadata?.coverFee === "true";
+    const originalAmount = metadata?.originalAmount ? parseFloat(metadata.originalAmount) : amount;
+    const platformFeeAmount = metadata?.platformFee ? parseFloat(metadata.platformFee) : 0;
+
+    let finalAmount: number;
+    let applicationFee: number;
+
+    if (isCoveringFee) {
+        // User is covering the fee, so the full amount goes to the recipient
+        // The amount passed in already includes the platform fee
+        finalAmount = amount * 100; // Convert to cents
+        applicationFee = Math.round(platformFeeAmount * 100); // Platform fee in cents
+    } else {
+        // Standard flow - fee is deducted from the tip
+        finalAmount = amount * 100; // Convert to cents
+        applicationFee = Math.round(amount * 100 * 0.045); // 4.5% fee in cents
+    }
 
     const paymentIntentData = {
-        amount: amount * 100,
+        amount: finalAmount,
         currency: "usd",
         receipt_email: fromEmail,
-        application_fee_amount: fee, // take a 4.5% transaction fee
-        metadata: metadata
+        application_fee_amount: applicationFee,
+        metadata: {
+            ...metadata,
+            isCoveringFee: isCoveringFee.toString(),
+            originalTipAmount: originalAmount.toString(),
+            platformFeeAmount: platformFeeAmount.toString()
+        }
     };
 
     // Create the payment intent
@@ -50,7 +72,7 @@ export async function createPaymentIntent(
     }
 
     const { error } = await db.insert(transaction).values({
-        amount: amount * 100,
+        amount: finalAmount,
         fromUserId: selfUser.id,
         toUserId: user.userId,
         stripeId: pi.id,
@@ -58,7 +80,7 @@ export async function createPaymentIntent(
         isCompleted: false,
         netAmount: 0,
         stripeFee: 0,
-        applicationFee: fee,
+        applicationFee: applicationFee,
         message: metadata?.message || "No message",
         fromUserEmail: fromEmail
     });
@@ -104,52 +126,67 @@ export async function completeTransaction(transactionId: string): Promise<{
 
     const profile = await getProfileByUserId(existingTransaction.toUserId || "");
 
-    const { balanceTransaction } = await getStripeTransaction(
-        transactionId,
-        profile?.stripeAcctID || ""
-    );
+    try {
+        const { balanceTransaction } = await getStripeTransaction(
+            transactionId,
+            profile?.stripeAcctID || ""
+        );
 
-    const netAmount = balanceTransaction.net;
-    const stripeFee = balanceTransaction.fee_details?.find(
-        (fee) => fee.type === "stripe_fee"
-    )?.amount;
-    const applicationFee = balanceTransaction.fee_details?.find(
-        (fee) => fee.type === "application_fee"
-    )?.amount;
-    const grossAmount = balanceTransaction.amount;
+        // If balance transaction is not available yet, we can't complete the transaction
+        if (!balanceTransaction) {
+            throw new Error(
+                "Balance transaction not available yet - charge may still be processing"
+            );
+        }
 
-    // Only proceed with completion if not already completed
-    const [updatedTransaction] = await db
-        .update(transaction)
-        .set({
-            amount: Number(grossAmount),
-            isCompleted: true,
-            netAmount: Number(netAmount),
-            stripeFee: Number(stripeFee),
-            applicationFee: Number(applicationFee),
-            updatedAt: new Date()
-        })
-        .where(eq(transaction.stripeId, transactionId))
-        .returning();
+        const netAmount = balanceTransaction.net;
+        const stripeFee = balanceTransaction.fee_details?.find(
+            (fee) => fee.type === "stripe_fee"
+        )?.amount;
+        const applicationFee = balanceTransaction.fee_details?.find(
+            (fee) => fee.type === "application_fee"
+        )?.amount;
+        const grossAmount = balanceTransaction.amount;
 
-    if (!updatedTransaction) {
-        throw new Error("Error completing transaction");
+        // Only proceed with completion if not already completed
+        const [updatedTransaction] = await db
+            .update(transaction)
+            .set({
+                amount: Number(grossAmount),
+                isCompleted: true,
+                netAmount: Number(netAmount),
+                stripeFee: Number(stripeFee),
+                applicationFee: Number(applicationFee),
+                updatedAt: new Date()
+            })
+            .where(eq(transaction.stripeId, transactionId))
+            .returning();
+
+        if (!updatedTransaction) {
+            throw new Error("Error completing transaction");
+        }
+
+        const p = await stripe.paymentIntents.retrieve(transactionId, {
+            stripeAccount: profile?.stripeAcctID || undefined
+        });
+        const pm = await stripe.paymentMethods.retrieve(p.payment_method?.toString() || "", {
+            stripeAccount: profile?.stripeAcctID || undefined
+        });
+
+        return {
+            transaction: updatedTransaction,
+            success: true,
+            paymentMethod:
+                pm.type === "card" ? (pm.card?.last4 ?? null) : (pm.type?.toString() ?? null),
+            alreadyProcessed: false
+        };
+    } catch (error) {
+        // If we get a balance transaction error, the payment might still be processing
+        if (error instanceof Error && error.message.includes("balance_transaction")) {
+            throw new Error("Payment is still processing - please try again in a few moments");
+        }
+        throw error;
     }
-
-    const p = await stripe.paymentIntents.retrieve(transactionId, {
-        stripeAccount: profile?.stripeAcctID || undefined
-    });
-    const pm = await stripe.paymentMethods.retrieve(p.payment_method?.toString() || "", {
-        stripeAccount: profile?.stripeAcctID || undefined
-    });
-
-    return {
-        transaction: updatedTransaction,
-        success: true,
-        paymentMethod:
-            pm.type === "card" ? (pm.card?.last4 ?? null) : (pm.type?.toString() ?? null),
-        alreadyProcessed: false
-    };
 }
 
 export async function getStripeDashboardLink(userId: string) {
@@ -217,14 +254,26 @@ export async function getStripeTransaction(paymentIntentId: string, stripeAcctID
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId, {
         stripeAccount: stripeAcctID
     });
+
     const charge = await stripe.charges.retrieve(paymentIntent.latest_charge as string, {
         stripeAccount: stripeAcctID
     });
+
+    // Check if balance_transaction is available before trying to retrieve it
+    if (!charge.balance_transaction) {
+        return {
+            paymentIntent,
+            charge,
+            balanceTransaction: null
+        };
+    }
+
     const balanceTransaction = await stripe.balanceTransactions.retrieve(
         charge.balance_transaction as string,
         {
             stripeAccount: stripeAcctID
         }
     );
+
     return { paymentIntent, charge, balanceTransaction };
 }

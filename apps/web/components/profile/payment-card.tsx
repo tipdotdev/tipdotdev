@@ -12,13 +12,23 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Checkbox } from "../ui/checkbox";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from "../ui/dialog";
 import { Textarea } from "../ui/textarea";
 import StripeCard from "./stripe-card";
 
 const formSchema = z.object({
     amount: z.number().int().positive().min(3).max(1000),
     email: z.string().email(),
-    message: z.string().max(500).optional()
+    message: z.string().max(500).optional(),
+    coverAllFees: z.boolean().default(false)
 });
 
 export default function PaymentCard({
@@ -37,9 +47,29 @@ export default function PaymentCard({
         defaultValues: {
             amount: 5,
             email: "",
-            message: ""
+            message: "",
+            coverAllFees: false
         }
     });
+
+    // Watch the amount and coverAllFees values to calculate total
+    const amount = form.watch("amount");
+    const coverAllFees = form.watch("coverAllFees");
+
+    // Calculate fees and total amount
+    const platformFee = amount ? Math.round(amount * 0.045 * 100) / 100 : 0;
+
+    let totalAmount = amount;
+    let estimatedStripeFee = 0;
+
+    if (coverAllFees) {
+        // Calculate total needed so recipient gets full amount after all fees
+        // Formula: totalCharge = (tipAmount * 1.045 + 0.30) / 0.971
+        totalAmount = Math.round(((amount * 1.045 + 0.3) / 0.971) * 100) / 100;
+        estimatedStripeFee = Math.round((totalAmount * 0.029 + 0.3) * 100) / 100;
+    } else {
+        estimatedStripeFee = Math.round((amount * 0.029 + 0.3) * 100) / 100;
+    }
 
     // Anonymous sign-in on mount (if not already signed in)
     useEffect(() => {
@@ -63,8 +93,12 @@ export default function PaymentCard({
 
         try {
             const sai: string = stripeAcctID as string; // Type assertion
-            const pi = await createPaymentIntent(values.amount, sai, values.email, undefined, {
-                message: values.message || "No message"
+            const pi = await createPaymentIntent(totalAmount, sai, values.email, undefined, {
+                message: values.message || "No message",
+                feeOption: values.coverAllFees ? "all" : "none",
+                originalAmount: values.amount.toString(),
+                platformFee: platformFee.toString(),
+                estimatedStripeFee: estimatedStripeFee.toString()
             });
             setPaymentIntent(pi as PaymentIntentSimple);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -153,12 +187,119 @@ export default function PaymentCard({
                                     </FormItem>
                                 )}
                             />
+                            <FormField
+                                control={form.control}
+                                name="coverAllFees"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <div className="flex items-start space-x-3 rounded-md border border-border p-4">
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                    className="mt-0.5"
+                                                />
+                                                <div className="flex-1 space-y-1">
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <p className="text-sm font-medium">
+                                                            Cover all fees (+$
+                                                            {(totalAmount - amount).toFixed(2)})
+                                                        </p>
+                                                        <Dialog>
+                                                            <DialogTrigger asChild>
+                                                                <button
+                                                                    type="button"
+                                                                    className="text-xs text-primary underline hover:no-underline"
+                                                                >
+                                                                    Learn More
+                                                                </button>
+                                                            </DialogTrigger>
+                                                            <DialogContent className="max-w-md">
+                                                                <DialogHeader>
+                                                                    <DialogTitle>
+                                                                        Complete Fee Coverage
+                                                                    </DialogTitle>
+                                                                    <DialogDescription className="space-y-3 text-left">
+                                                                        <p>
+                                                                            This option covers both
+                                                                            platform fees and
+                                                                            Stripe&apos;s processing
+                                                                            fees.
+                                                                        </p>
+                                                                        <div className="space-y-2 rounded-lg bg-muted p-3">
+                                                                            <div>
+                                                                                <p className="text-sm font-medium">
+                                                                                    Platform Fee
+                                                                                    (4.5%)
+                                                                                </p>
+                                                                                <p className="text-xs text-muted-foreground">
+                                                                                    $
+                                                                                    {platformFee.toFixed(
+                                                                                        2
+                                                                                    )}{" "}
+                                                                                    - Platform
+                                                                                    maintenance and
+                                                                                    support
+                                                                                </p>
+                                                                            </div>
+                                                                            <div>
+                                                                                <p className="text-sm font-medium">
+                                                                                    Stripe
+                                                                                    Processing Fee
+                                                                                    (~2.9% + $0.30)
+                                                                                </p>
+                                                                                <p className="text-xs text-muted-foreground">
+                                                                                    ~$
+                                                                                    {estimatedStripeFee.toFixed(
+                                                                                        2
+                                                                                    )}{" "}
+                                                                                    - Payment
+                                                                                    processing costs
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <p>
+                                                                            <strong>
+                                                                                {username}
+                                                                            </strong>{" "}
+                                                                            will receive the full $
+                                                                            {amount} you intended to
+                                                                            tip.
+                                                                        </p>
+                                                                    </DialogDescription>
+                                                                </DialogHeader>
+                                                            </DialogContent>
+                                                        </Dialog>
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Help {username} receive the full tip amount
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            {coverAllFees && (
+                                <div className="rounded-md border border-green-500 bg-green-700/10 p-3">
+                                    <p className="text-sm">
+                                        <strong>Total: ${totalAmount.toFixed(2)}</strong> (includes
+                                        all fees so {username} gets ${amount})
+                                    </p>
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        {username} will receive the full ${amount} you intended to
+                                        tip.
+                                    </p>
+                                </div>
+                            )}
                             <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
                                 {isLoading ? (
                                     "Processing..."
                                 ) : (
                                     <>
-                                        Tip {username} ${form.getValues("amount") || "0"}
+                                        Tip {username} $
+                                        {totalAmount > 0 ? totalAmount.toFixed(2) : "0.00"}
                                     </>
                                 )}
                             </Button>
@@ -167,7 +308,7 @@ export default function PaymentCard({
                 ) : (
                     <div className="flex flex-col items-center justify-center gap-4 p-2">
                         <StripeCard
-                            amount={form.getValues("amount") * 100}
+                            amount={(coverAllFees ? totalAmount : amount) * 100}
                             accountID={stripeAcctID}
                             clientSecret={paymentIntent?.client_secret || ""}
                             username={username}
