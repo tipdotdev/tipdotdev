@@ -1,20 +1,26 @@
 import { getProfile, getSelfProfile } from "@/actions/profile";
-import { getSupporterCount } from "@/actions/user";
 import PaymentCard from "@/components/profile/payment-card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { ProfileHeader } from "@/components/profile/profile-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import GitHubLogo from "@/public/icons/github.svg";
+import InstagramLogo from "@/public/icons/instagram.svg";
 import TwitterLogo from "@/public/icons/twitter.svg";
 import { auth } from "@/utils/auth";
-import { LinkIcon, ShareIcon } from "lucide-react";
+import { LinkIcon } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 type Props = {
     params: Promise<{ username: string }>;
+};
+
+// Define the social media type based on the schema
+type SocialMediaData = {
+    twitter?: string | null;
+    github?: string | null;
+    instagram?: string | null;
 };
 
 export default async function Page({ params }: Props) {
@@ -30,92 +36,30 @@ export default async function Page({ params }: Props) {
     // If the profile doesn't exist, show a 404 page
     if (!profile) notFound();
 
-    const supporters = await getSupporterCount(profile.userId);
-
     return (
         <div className="flex min-h-screen flex-col items-center justify-start font-normal">
             <section className="relative mt-1 flex h-full w-full flex-col items-center justify-start px-4 py-4">
                 <div className="flex w-full max-w-full flex-col items-center justify-center gap-2 md:max-w-5xl">
-                    <Banner
-                        src={profile.bannerUrl || ""}
-                        alt={profile.username + "'s banner on tip.dev"}
-                    />
-                    <div className="-mt-4 flex w-full flex-row items-center justify-between gap-4">
-                        <div className="flex items-center justify-center gap-4">
-                            <Avatar className="h-24 w-24 border-[6px] border-background">
-                                <AvatarFallback className="text-2xl">
-                                    {profile.username[0].toUpperCase()}
-                                </AvatarFallback>
-                                <AvatarImage
-                                    src={profile.avatarUrl || ""}
-                                    alt={profile.username + "'s avatar on tip.dev"}
-                                />
-                            </Avatar>
-                            <div className="flex flex-col items-start justify-center gap-1">
-                                <p className="font-mono text-2xl">{username}</p>
-                                <ProfileStats supporters={supporters} />
-                            </div>
-                        </div>
-                        <div className="flex items-center justify-center gap-4">
-                            <Button variant="secondary" size="lg">
-                                <ShareIcon />
-                                Share
-                            </Button>
-                            <Button variant="secondary" size="lg" disabled={!sn}>
-                                {isOwner ? "Edit Profile" : "Follow"}
-                            </Button>
-                        </div>
-                    </div>
+                    <ProfileHeader profile={profile} isOwner={isOwner} isSignedIn={sn} />
                     <Separator className="my-4" />
-                    <div className="grid w-full grid-cols-2 gap-2">
+                    <div className="grid w-full grid-cols-1 gap-2 md:grid-cols-2">
                         <AboutCard
                             bio={profile.bio || "We don't know much about this user yet."}
                             website={profile.website || undefined}
-                            socials={undefined}
+                            socials={profile.socialMedia as SocialMediaData}
                         />
-                        {profile.stripeConnected ? (
-                            <PaymentCard
-                                username={username}
-                                stripeAcctID={profile.stripeAcctID || ""}
-                                isSignedIn={sn}
-                            />
-                        ) : (
-                            <Card className="h-full w-full border-red-500/40 bg-red-500/20 p-4">
-                                <CardContent className="flex h-full flex-col items-center justify-center p-0">
-                                    <p className="text-sm">
-                                        This user is unable to receive tips at the moment.
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        )}
+                        <PaymentCard
+                            username={username}
+                            stripeAcctID={profile.stripeAcctID || ""}
+                            isSignedIn={sn}
+                            disabled={!profile.stripeConnected || !profile.allowTips}
+                        />
                     </div>
                 </div>
             </section>
         </div>
     );
 }
-
-function Banner({ src, alt }: { src: string; alt: string }) {
-    return (
-        <div className="relative aspect-[4/1] w-full overflow-hidden rounded-lg bg-muted">
-            {src && <img src={src} alt={alt} className="h-full w-full object-cover" />}
-        </div>
-    );
-}
-
-function ProfileStats({ supporters }: { supporters: number }) {
-    return (
-        <div className="flex items-center justify-center gap-1 font-mono text-sm">
-            <p>{supporters}</p>
-            <p className="text-foreground/40">Supporters</p>
-        </div>
-    );
-}
-
-type SocialMedia = {
-    label: string;
-    handle: string;
-};
 
 function AboutCard({
     bio,
@@ -124,8 +68,13 @@ function AboutCard({
 }: {
     bio?: string;
     website?: string;
-    socials?: SocialMedia[];
+    socials?: SocialMediaData;
 }) {
+    // Get the available social media platforms that have URLs
+    const availableSocials = socials
+        ? Object.entries(socials).filter(([, url]) => url && url.trim() !== "")
+        : [];
+
     return (
         <Card className="h-fit w-full border-border/40 bg-card/40 p-4">
             <CardHeader className="p-0">
@@ -145,10 +94,14 @@ function AboutCard({
                         </Link>
                     </div>
                 )}
-                {socials && socials.length > 0 && (
+                {availableSocials.length > 0 && (
                     <div className="mt-4 flex flex-row gap-3">
-                        {socials.map((social, index) => (
-                            <Social key={index} social={social} />
+                        {availableSocials.map(([platform, url]) => (
+                            <Social
+                                key={platform}
+                                platform={platform as keyof SocialMediaData}
+                                url={url!}
+                            />
                         ))}
                     </div>
                 )}
@@ -157,14 +110,17 @@ function AboutCard({
     );
 }
 
-function Social({ social }: { social: SocialMedia }) {
+function Social({ platform, url }: { platform: keyof SocialMediaData; url: string }) {
     return (
-        <Link href={`https://${social.label}.com/${social.handle}`} target="_blank">
-            {social.label == "twitter" && (
+        <Link href={url} target="_blank">
+            {platform === "twitter" && (
                 <TwitterLogo className="size-4 fill-foreground/40 transition-all hover:fill-foreground" />
             )}
-            {social.label == "github" && (
+            {platform === "github" && (
                 <GitHubLogo className="size-4 fill-foreground/40 transition-all hover:fill-foreground" />
+            )}
+            {platform === "instagram" && (
+                <InstagramLogo className="size-4 fill-foreground/40 transition-all hover:fill-foreground" />
             )}
         </Link>
     );
