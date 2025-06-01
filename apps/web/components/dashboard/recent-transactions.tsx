@@ -162,8 +162,8 @@ export default function RecentTransactionsWidget({ userId }: { userId: string })
                                                     USD
                                                 </span>
                                             </TableCell>
-                                            <TableCell>
-                                                <span className="text-sm text-muted-foreground">
+                                            <TableCell className="max-w-[200px]">
+                                                <span className="block truncate text-sm text-muted-foreground">
                                                     {transaction.message || "—"}
                                                 </span>
                                             </TableCell>
@@ -394,8 +394,10 @@ export default function RecentTransactionsWidget({ userId }: { userId: string })
                                     <label className="text-sm font-medium text-muted-foreground">
                                         Message
                                     </label>
-                                    <div className="mt-2 rounded-lg bg-muted p-3">
-                                        <p className="text-sm">{selectedTransaction.message}</p>
+                                    <div className="mt-2 max-h-32 overflow-y-auto rounded-lg bg-muted p-3">
+                                        <p className="whitespace-pre-wrap break-all text-sm">
+                                            {selectedTransaction.message}
+                                        </p>
                                     </div>
                                 </div>
                             )}
