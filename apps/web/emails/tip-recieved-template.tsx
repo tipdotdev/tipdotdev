@@ -23,6 +23,7 @@ interface TipReceivedEmailProps {
     transactionId: string;
     receivedOn: string;
     platformFee: number;
+    processingFee: number;
     tipperEmail: string;
     recieverEmail: string;
     message: string;
@@ -33,6 +34,7 @@ export const TipReceivedEmail = ({
     transactionId,
     receivedOn,
     platformFee,
+    processingFee,
     tipperEmail,
     recieverEmail,
     message
@@ -159,7 +161,7 @@ export const TipReceivedEmail = ({
                             <Column style={payoutValueColumn}>
                                 <Text style={payoutValue}>
                                     -
-                                    {(platformFee / 100).toLocaleString("en-US", {
+                                    {(processingFee / 100).toLocaleString("en-US", {
                                         style: "currency",
                                         currency: "USD"
                                     })}
@@ -173,13 +175,13 @@ export const TipReceivedEmail = ({
                             </Column>
                             <Column style={payoutValueColumn}>
                                 <Text style={payoutTotalValue}>
-                                    {(amount / 100 - platformFee / 100).toLocaleString("en-US", {
-                                        style: "currency",
-                                        currency: "USD"
-                                    })}
-                                </Text>
-                                <Text style={footerSmall}>
-                                    Not including any additional Stripe fees
+                                    {((amount - processingFee - platformFee) / 100).toLocaleString(
+                                        "en-US",
+                                        {
+                                            style: "currency",
+                                            currency: "USD"
+                                        }
+                                    )}
                                 </Text>
                             </Column>
                         </Row>
@@ -218,7 +220,7 @@ export const TipReceivedEmail = ({
                     text={
                         "tip&#8203;.dev --earnings" +
                         `
-                        ${(amount / 100 - platformFee / 100).toLocaleString("en-US", {
+                        ${((amount - processingFee - platformFee) / 100).toLocaleString("en-US", {
                             style: "currency",
                             currency: "USD"
                         })}`
@@ -235,6 +237,7 @@ TipReceivedEmail.PreviewProps = {
     transactionId: "1234567890",
     receivedOn: "Jan 1, 2023",
     platformFee: 45,
+    processingFee: 10,
     tipperEmail: "sender@example.com",
     recieverEmail: "reciever@example.com",
     message:

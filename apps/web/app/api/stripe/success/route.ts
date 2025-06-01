@@ -41,7 +41,8 @@ export async function POST(request: Request) {
                 recieverBio: undefined,
                 message: transaction.message || undefined,
                 amount: transaction.amount,
-                processingFee: 0,
+                processingFee: transaction.stripeFee,
+                applicationFee: transaction.applicationFee,
                 date: new Date().toISOString(),
                 tipId: transaction.id.toString(),
                 paymentMethod: paymentMethod || ""

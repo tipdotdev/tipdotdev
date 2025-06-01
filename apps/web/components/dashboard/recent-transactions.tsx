@@ -104,7 +104,7 @@ export default function RecentTransactionsWidget({ userId }: { userId: string })
                     <>
                         <Table>
                             <TableHeader>
-                                <TableRow className="font-mono">
+                                <TableRow className="font-mono text-sm">
                                     <TableHead>From</TableHead>
                                     <TableHead>Type</TableHead>
                                     <TableHead>Net</TableHead>

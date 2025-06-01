@@ -74,6 +74,7 @@ interface TipReceiptEmail {
     message?: string;
     amount: number;
     processingFee: number;
+    applicationFee: number;
     date: string;
     tipId: string;
     paymentMethod: string;
@@ -96,7 +97,7 @@ export async function sendTipReceipts(data: TipReceiptEmail): Promise<EmailRespo
             recieverBio: data.recieverBio,
             message: data.message,
             amount: data.amount,
-            processingFee: data.processingFee,
+            processingFee: 0,
             date: formattedDate,
             tipId: data.tipId,
             paymentMethod: data.paymentMethod
@@ -108,10 +109,11 @@ export async function sendTipReceipts(data: TipReceiptEmail): Promise<EmailRespo
             amount: data.amount,
             transactionId: data.tipId,
             receivedOn: formattedDate,
-            platformFee: data.amount * 0.045,
+            platformFee: data.applicationFee,
             tipperEmail: data.senderEmail,
             recieverEmail: data.recieverEmail,
-            message: data.message || ""
+            message: data.message || "",
+            processingFee: data.processingFee
         })
     );
 
