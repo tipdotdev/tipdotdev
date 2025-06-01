@@ -1,5 +1,6 @@
 "use client";
 
+import { getStripeDashboardLink } from "@/actions/stripe";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     DropdownMenu,
@@ -9,9 +10,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { DotsVerticalIcon } from "@radix-ui/react-icons";
 import {
+    BadgeDollarSignIcon,
     Code2Icon,
-    DollarSignIcon,
     HelpCircleIcon,
     LogOutIcon,
     SettingsIcon,
@@ -26,29 +28,41 @@ export default function AccountDropdown({ profile }: { profile: any }) {
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-fit w-fit rounded-full p-1">
-                        <Avatar className="h-8 w-8">
+                    <Button variant="ghost" className="h-fit w-fit rounded-md border p-1">
+                        {/* <CircleEllipsisIcon className="text-muted-foreground/80" /> */}
+
+                        <Avatar className="h-8 w-8 rounded-sm">
                             <AvatarFallback>
                                 {profile.username ? profile.username[0].toUpperCase() : "U"}
                             </AvatarFallback>
                             <AvatarImage
                                 src={profile.avatarUrl}
                                 alt={profile.username + "'s avatar"}
+                                className="rounded-sm"
                             />
                         </Avatar>
+                        <span className="text-sm font-normal text-muted-foreground">
+                            @{profile.username}
+                        </span>
+                        <DotsVerticalIcon className="h-[1rem] w-[1rem] text-muted-foreground/60" />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56">
                     <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                            <SettingsIcon className="mr-2 h-[1rem] w-[1rem]" />
-                            Account Settings
-                        </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                            <Link href="/billing">
-                                <DollarSignIcon className="mr-2 h-[1rem] w-[1rem]" />
-                                Billing
+                            <Link href="/dashboard/settings">
+                                <SettingsIcon className="mr-2 h-[1rem] w-[1rem]" />
+                                Settings
                             </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={async () => {
+                                const url = await getStripeDashboardLink(profile.userId);
+                                window.open(url, "_blank");
+                            }}
+                        >
+                            <BadgeDollarSignIcon className="mr-2 h-[1rem] w-[1rem]" />
+                            Stripe Dashboard
                         </DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />

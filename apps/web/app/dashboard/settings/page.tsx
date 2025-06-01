@@ -1,5 +1,4 @@
 import { getSelfProfile } from "@/actions/profile";
-import AccountDropdown from "@/components/dashboard/account-dropdown";
 import DashboardGrid, { DashboardGridItem } from "@/components/dashboard/grid";
 import {
     Breadcrumb,
@@ -36,7 +35,6 @@ export default async function Page() {
                         <SidebarTrigger className="flex md:hidden" />
                         <h1 className="text-3xl font-bold">Settings</h1>
                     </div>
-                    <AccountDropdown profile={profile} />
                 </div>
                 <Breadcrumb className="font-mono text-xs">
                     <BreadcrumbList>

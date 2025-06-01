@@ -1,5 +1,7 @@
 import { Home, Settings, User } from "lucide-react";
 
+import { getProfileByUserId } from "@/actions/profile";
+import { getSelfUser } from "@/actions/user";
 import {
     Sidebar as Sb,
     SidebarContent,
@@ -9,9 +11,9 @@ import {
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarTrigger
+    SidebarMenuItem
 } from "@/components/ui/sidebar";
+import AccountDropdown from "./account-dropdown";
 
 // Menu items.
 const items = [
@@ -32,7 +34,10 @@ const items = [
     }
 ];
 
-export function Sidebar() {
+export async function Sidebar() {
+    const user = await getSelfUser();
+    const profile = await getProfileByUserId(user?.id || "");
+
     return (
         <Sb collapsible="icon" variant="inset">
             <SidebarHeader className="border-0">
@@ -57,7 +62,10 @@ export function Sidebar() {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                <SidebarTrigger />
+                <div className="flex flex-row items-center justify-between">
+                    {/* <SidebarTrigger /> */}
+                    <AccountDropdown profile={profile} />
+                </div>
             </SidebarFooter>
         </Sb>
     );
