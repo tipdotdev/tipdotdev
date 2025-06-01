@@ -2,7 +2,6 @@
 "use client";
 
 import { getStripeDashboardLink } from "@/actions/stripe";
-import { getRecentTransactions } from "@/actions/user";
 import { transaction } from "@/db/schema";
 import { InferSelectModel } from "drizzle-orm";
 import { ChevronLeft, ChevronRight, Copy, ExternalLink } from "lucide-react";
@@ -15,9 +14,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Skeleton } from "../ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 
-export default function RecentTransactionsWidget({ userId }: { userId: string }) {
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [transactions, setTransactions] = useState<InferSelectModel<typeof transaction>[]>([]);
+interface RecentTransactionsWidgetProps {
+    userId: string;
+    initialTransactions?: InferSelectModel<typeof transaction>[];
+}
+
+export default function RecentTransactionsWidget({
+    userId,
+    initialTransactions = []
+}: RecentTransactionsWidgetProps) {
+    const [transactions, setTransactions] =
+        useState<InferSelectModel<typeof transaction>[]>(initialTransactions);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [selectedTransaction, setSelectedTransaction] = useState<InferSelectModel<
         typeof transaction
@@ -26,14 +33,9 @@ export default function RecentTransactionsWidget({ userId }: { userId: string })
     const transactionsPerPage = 10;
 
     useEffect(() => {
-        setIsLoading(true);
-        const fetchTransactions = async () => {
-            const transactions = await getRecentTransactions(userId, "All-time");
-            setTransactions(transactions);
-            setIsLoading(false);
-        };
-        fetchTransactions();
-    }, [userId]);
+        // Use initial data on mount
+        setTransactions(initialTransactions);
+    }, [initialTransactions]);
 
     // Calculate pagination
     const totalPages = Math.ceil(transactions.length / transactionsPerPage);
@@ -94,122 +96,110 @@ export default function RecentTransactionsWidget({ userId }: { userId: string })
             </div>
 
             <div className="mt-4">
-                {isLoading ? (
-                    <div className="space-y-2">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                            <Skeleton key={i} className="h-12 w-full" />
-                        ))}
-                    </div>
-                ) : (
-                    <>
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="font-mono text-sm">
-                                    <TableHead>From</TableHead>
-                                    <TableHead>Type</TableHead>
-                                    <TableHead>Net</TableHead>
-                                    <TableHead>Gross</TableHead>
-                                    <TableHead>Message</TableHead>
-                                    <TableHead>Date</TableHead>
+                <Table>
+                    <TableHeader>
+                        <TableRow className="font-mono text-sm">
+                            <TableHead>From</TableHead>
+                            <TableHead>Type</TableHead>
+                            <TableHead>Net</TableHead>
+                            <TableHead>Gross</TableHead>
+                            <TableHead>Message</TableHead>
+                            <TableHead>Date</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {currentTransactions.length === 0 ? (
+                            <TableRow>
+                                <TableCell
+                                    colSpan={6}
+                                    className="text-center text-muted-foreground"
+                                >
+                                    No transactions found :(
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            currentTransactions.map((transaction) => (
+                                <TableRow
+                                    key={transaction.id}
+                                    className="cursor-pointer hover:bg-muted/50"
+                                    onClick={() => handleRowClick(transaction)}
+                                >
+                                    <TableCell>
+                                        <div className="flex flex-col">
+                                            <span className="font-medium">
+                                                {transaction.fromUserEmail || "Anonymous"}
+                                            </span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <span
+                                            className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                                                transaction.type === "tip"
+                                                    ? "bg-green-400 text-black"
+                                                    : "bg-blue-400 text-black"
+                                            }`}
+                                        >
+                                            {transaction.type === "tip" ? "Tip" : "Subscription"}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="font-bold">
+                                        {formatAmount(transaction.netAmount)}{" "}
+                                        <span className="text-xs font-normal text-muted-foreground">
+                                            USD
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="font-normal">
+                                        {formatAmount(transaction.amount)}{" "}
+                                        <span className="text-xs font-normal text-muted-foreground">
+                                            USD
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="max-w-[200px]">
+                                        <span className="block truncate text-sm text-muted-foreground">
+                                            {transaction.message || "—"}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="font-medium">
+                                        {formatDate(transaction.createdAt)}
+                                    </TableCell>
                                 </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {currentTransactions.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={5}
-                                            className="text-center text-muted-foreground"
-                                        >
-                                            No transactions found :(
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    currentTransactions.map((transaction) => (
-                                        <TableRow
-                                            key={transaction.id}
-                                            className="cursor-pointer hover:bg-muted/50"
-                                            onClick={() => handleRowClick(transaction)}
-                                        >
-                                            <TableCell>
-                                                <div className="flex flex-col">
-                                                    <span className="font-medium">
-                                                        {transaction.fromUserEmail || "Anonymous"}
-                                                    </span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <span
-                                                    className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                                                        transaction.type === "tip"
-                                                            ? "bg-green-400 text-black"
-                                                            : "bg-blue-400 text-black"
-                                                    }`}
-                                                >
-                                                    {transaction.type === "tip"
-                                                        ? "Tip"
-                                                        : "Subscription"}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="font-bold">
-                                                {formatAmount(transaction.netAmount)}{" "}
-                                                <span className="text-xs font-normal text-muted-foreground">
-                                                    USD
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="font-normal">
-                                                {formatAmount(transaction.amount)}{" "}
-                                                <span className="text-xs font-normal text-muted-foreground">
-                                                    USD
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="max-w-[200px]">
-                                                <span className="block truncate text-sm text-muted-foreground">
-                                                    {transaction.message || "—"}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="font-medium">
-                                                {formatDate(transaction.createdAt)}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-
-                        {transactions.length > transactionsPerPage && (
-                            <div className="mt-4 flex items-center justify-between">
-                                <div className="text-sm text-muted-foreground">
-                                    {startIndex + 1}-{Math.min(endIndex, transactions.length)} of{" "}
-                                    {transactions.length}
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={goToPreviousPage}
-                                        disabled={currentPage === 1}
-                                    >
-                                        <ChevronLeft className="h-4 w-4" />
-                                        Previous
-                                    </Button>
-                                    <div className="flex items-center space-x-1">
-                                        <span className="text-sm font-medium">{currentPage}</span>
-                                        <span className="text-sm text-muted-foreground">of</span>
-                                        <span className="text-sm font-medium">{totalPages}</span>
-                                    </div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={goToNextPage}
-                                        disabled={currentPage === totalPages}
-                                    >
-                                        Next
-                                        <ChevronRight className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </div>
+                            ))
                         )}
-                    </>
+                    </TableBody>
+                </Table>
+
+                {transactions.length > transactionsPerPage && (
+                    <div className="mt-4 flex items-center justify-between">
+                        <div className="text-sm text-muted-foreground">
+                            {startIndex + 1}-{Math.min(endIndex, transactions.length)} of{" "}
+                            {transactions.length}
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={goToPreviousPage}
+                                disabled={currentPage === 1}
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                                Previous
+                            </Button>
+                            <div className="flex items-center space-x-1">
+                                <span className="text-sm font-medium">{currentPage}</span>
+                                <span className="text-sm text-muted-foreground">of</span>
+                                <span className="text-sm font-medium">{totalPages}</span>
+                            </div>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={goToNextPage}
+                                disabled={currentPage === totalPages}
+                            >
+                                Next
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
                 )}
             </div>
 

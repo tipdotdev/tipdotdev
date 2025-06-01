@@ -10,12 +10,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Skeleton } from "../ui/skeleton";
 import PercentChange from "./percent-change";
 
-export default function SupportersWidget({ userId }: { userId: string }) {
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [transactions, setTransactions] = useState<InferSelectModel<typeof transaction>[]>([]);
+interface SupportersWidgetProps {
+    userId: string;
+    initialTransactions?: InferSelectModel<typeof transaction>[];
+    initialPreviousTransactions?: InferSelectModel<typeof transaction>[];
+}
+
+export default function SupportersWidget({
+    userId,
+    initialTransactions = [],
+    initialPreviousTransactions = []
+}: SupportersWidgetProps) {
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [transactions, setTransactions] =
+        useState<InferSelectModel<typeof transaction>[]>(initialTransactions);
     const [previousTransactions, setPreviousTransactions] = useState<
         InferSelectModel<typeof transaction>[]
-    >([]);
+    >(initialPreviousTransactions);
     const [timePeriod, setTimePeriod] = useState<
         | "All-time"
         | "Today"
@@ -32,6 +43,14 @@ export default function SupportersWidget({ userId }: { userId: string }) {
     const [supportersFromSubs, setSupportersFromSubs] = useState<number>(0);
 
     useEffect(() => {
+        // Only fetch new data if the time period has changed from "Today"
+        if (timePeriod === "Today") {
+            // Use initial data
+            setTransactions(initialTransactions);
+            setPreviousTransactions(initialPreviousTransactions);
+            return;
+        }
+
         setIsLoading(true);
         const fetchTransactions = async () => {
             const [currentTransactions, prevTransactions] = await Promise.all([
@@ -43,7 +62,7 @@ export default function SupportersWidget({ userId }: { userId: string }) {
             setIsLoading(false);
         };
         fetchTransactions();
-    }, [userId, timePeriod]);
+    }, [userId, timePeriod, initialTransactions, initialPreviousTransactions]);
 
     useEffect(() => {
         // Count unique supporters by email

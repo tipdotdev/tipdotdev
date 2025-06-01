@@ -1,4 +1,5 @@
 import { getSelfProfile } from "@/actions/profile";
+import { getPreviousPeriodTransactions, getRecentTransactions } from "@/actions/user";
 import DashboardGrid, { DashboardGridItem } from "@/components/dashboard/grid";
 import { WelcomeBack } from "@/components/dashboard/home";
 import IncomeWidget from "@/components/dashboard/income-widget";
@@ -30,6 +31,13 @@ export default async function Page() {
         redirect("/onboarding/username");
     }
 
+    // Fetch initial data for all widgets to reduce DB calls
+    const [todayTransactions, todayPreviousTransactions, allTimeTransactions] = await Promise.all([
+        getRecentTransactions(user.id, "Today"),
+        getPreviousPeriodTransactions(user.id, "Today"),
+        getRecentTransactions(user.id, "All-time")
+    ]);
+
     return (
         <div className="flex min-h-screen flex-col items-center justify-center font-normal">
             <section className="relative mt-1 flex h-full w-full flex-col items-start justify-start px-4 py-4">
@@ -52,15 +60,26 @@ export default async function Page() {
                     </DashboardGridItem>
 
                     <DashboardGridItem className="col-span-4 md:col-span-2">
-                        <IncomeWidget userId={user.id} />
+                        <IncomeWidget
+                            userId={user.id}
+                            initialTransactions={todayTransactions}
+                            initialPreviousTransactions={todayPreviousTransactions}
+                        />
                     </DashboardGridItem>
 
                     <DashboardGridItem className="col-span-4 md:col-span-2">
-                        <SupportersWidget userId={user.id} />
+                        <SupportersWidget
+                            userId={user.id}
+                            initialTransactions={todayTransactions}
+                            initialPreviousTransactions={todayPreviousTransactions}
+                        />
                     </DashboardGridItem>
 
                     <DashboardGridItem className="col-span-4">
-                        <RecentTransactionsWidget userId={user.id} />
+                        <RecentTransactionsWidget
+                            userId={user.id}
+                            initialTransactions={allTimeTransactions}
+                        />
                     </DashboardGridItem>
                 </DashboardGrid>
 
