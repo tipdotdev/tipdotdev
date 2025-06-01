@@ -33,16 +33,16 @@ export default function AccountDropdown({ profile }: { profile: any }) {
 
                         <Avatar className="h-8 w-8 rounded-sm">
                             <AvatarFallback>
-                                {profile.username ? profile.username[0].toUpperCase() : "U"}
+                                {profile?.username ? profile?.username[0].toUpperCase() : "U"}
                             </AvatarFallback>
                             <AvatarImage
-                                src={profile.avatarUrl}
-                                alt={profile.username + "'s avatar"}
+                                src={profile?.avatarUrl}
+                                alt={profile?.username + "'s avatar"}
                                 className="rounded-sm"
                             />
                         </Avatar>
                         <span className="text-sm font-normal text-muted-foreground">
-                            @{profile.username}
+                            @{profile?.username}
                         </span>
                         <DotsVerticalIcon className="h-[1rem] w-[1rem] text-muted-foreground/60" />
                     </Button>
@@ -57,7 +57,7 @@ export default function AccountDropdown({ profile }: { profile: any }) {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={async () => {
-                                const url = await getStripeDashboardLink(profile.userId);
+                                const url = await getStripeDashboardLink(profile?.userId);
                                 window.open(url, "_blank");
                             }}
                         >

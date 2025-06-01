@@ -3,9 +3,10 @@ import { Column, Row, Section, Text } from "@react-email/components";
 interface EmailHeaderProps {
     badgeLabel: string;
     title: string;
+    badgeType?: "security" | "info";
 }
 
-export const EmailHeader = ({ badgeLabel, title }: EmailHeaderProps) => (
+export const EmailHeader = ({ badgeLabel, title, badgeType }: EmailHeaderProps) => (
     <Section style={header}>
         <Row>
             <Column>
@@ -15,7 +16,9 @@ export const EmailHeader = ({ badgeLabel, title }: EmailHeaderProps) => (
                 </Text>
             </Column>
             <Column style={headerRight}>
-                <Text style={badgeText}>{badgeLabel}</Text>
+                <Text style={badgeType === "security" ? securityBadge : badgeText}>
+                    {badgeLabel}
+                </Text>
             </Column>
         </Row>
     </Section>
@@ -49,6 +52,18 @@ const headerRight = {
 const badgeText = {
     backgroundColor: "#ffffff",
     color: "#000000",
+    padding: "4px 12px",
+    borderRadius: "4px",
+    fontSize: "14px",
+    fontWeight: "bold",
+    fontFamily: "monospace",
+    display: "inline-block",
+    margin: "0"
+};
+
+const securityBadge = {
+    backgroundColor: "#ef4444",
+    color: "#ffffff",
     padding: "4px 12px",
     borderRadius: "4px",
     fontSize: "14px",

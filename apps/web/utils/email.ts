@@ -1,7 +1,10 @@
 import { getNotificationPreferencesByEmail } from "@/actions/notifications";
+import DeleteAccountTemplate from "@/emails/delete-account-template";
+import EmailChangeConfirmation from "@/emails/email-change-confirmation-template";
 import MagicLinkTemplate from "@/emails/magic-link-template";
 import TipReceiptEmail from "@/emails/tip-reciept-template";
 import TipReceivedEmail from "@/emails/tip-recieved-template";
+import VerifyEmailTemplate from "@/emails/verify-email-template";
 import type { SendEmailCommandInput } from "@aws-sdk/client-ses";
 import { SES } from "@aws-sdk/client-ses";
 import { render } from "@react-email/components";
@@ -172,6 +175,140 @@ export async function sendTipReceipts(data: TipReceiptEmail): Promise<EmailRespo
                 error: `Failed to send tip notification: ${recieverEmailRes.$metadata.httpStatusCode}`
             };
         }
+    }
+
+    return {
+        success: true
+    };
+}
+
+export async function sendEmailChangeConfirmation(
+    oldEmail: string,
+    newEmail: string,
+    url: string,
+    token: string
+): Promise<EmailResponse> {
+    const date = new Date();
+
+    const emailHTML = await render(
+        EmailChangeConfirmation({
+            oldEmail,
+            newEmail,
+            url,
+            token,
+            requestedAt: date
+        })
+    );
+
+    const params: SendEmailCommandInput = {
+        Source: fromEmail,
+        Destination: {
+            ToAddresses: [newEmail]
+        },
+        Message: {
+            Body: {
+                Html: {
+                    Charset: "UTF-8",
+                    Data: emailHTML
+                }
+            },
+            Subject: {
+                Charset: "UTF-8",
+                Data: "tip.dev Email Change Confirmation"
+            }
+        }
+    };
+
+    const res = await ses.sendEmail(params);
+    if (res.$metadata.httpStatusCode !== 200) {
+        return {
+            success: false,
+            error: `Failed to send email change confirmation: ${res.$metadata.httpStatusCode}`
+        };
+    }
+
+    return {
+        success: true
+    };
+}
+
+export async function sendVerifyEmail(
+    email: string,
+    url: string,
+    token: string,
+    userName?: string
+): Promise<EmailResponse> {
+    const emailHTML = await render(VerifyEmailTemplate({ url, token, email, userName }));
+
+    const params: SendEmailCommandInput = {
+        Source: fromEmail,
+        Destination: {
+            ToAddresses: [email]
+        },
+        Message: {
+            Body: {
+                Html: {
+                    Charset: "UTF-8",
+                    Data: emailHTML
+                }
+            },
+            Subject: {
+                Charset: "UTF-8",
+                Data: "Verify your email address - tip.dev"
+            }
+        }
+    };
+
+    const res = await ses.sendEmail(params);
+
+    if (res.$metadata.httpStatusCode !== 200) {
+        return {
+            success: false,
+            error: `Failed to send verify email: ${res.$metadata.httpStatusCode}`
+        };
+    }
+
+    return {
+        success: true
+    };
+}
+
+export async function sendAccountDeletion(
+    email: string,
+    url: string,
+    token: string,
+    userName?: string
+): Promise<EmailResponse> {
+    const emailHTML = await render(
+        DeleteAccountTemplate({ url, token, email, userName, requestedAt: new Date() })
+    );
+
+    const params: SendEmailCommandInput = {
+        Source: fromEmail,
+        Destination: {
+            ToAddresses: [email]
+        },
+        Message: {
+            Body: {
+                Html: {
+                    Charset: "UTF-8",
+                    Data: emailHTML
+                }
+            },
+            Subject: {
+                Charset: "UTF-8",
+                Data: "Delete your tip.dev account - Account Deletion Request"
+            }
+        }
+    };
+
+    const res = await ses.sendEmail(params);
+
+    if (res.$metadata.httpStatusCode !== 200) {
+        return {
+            success: false,
+            error: `Failed to send delete account email: ${res.$metadata.httpStatusCode}`
+        };
     }
 
     return {

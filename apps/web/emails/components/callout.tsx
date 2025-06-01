@@ -34,6 +34,48 @@ export const SuccessCallout = ({ icon, title, message }: InfoCalloutProps) => (
     </Section>
 );
 
+export const ErrorCallout = ({ icon, title, message }: InfoCalloutProps) => (
+    <Section style={errorSection}>
+        <Row style={errorRow}>
+            <Column style={iconColumn}>
+                <Text style={errorIcon}>{icon}</Text>
+            </Column>
+            <Column>
+                <Text style={errorTitle}>{title}</Text>
+                <Text style={errorMessage}>{message}</Text>
+            </Column>
+        </Row>
+    </Section>
+);
+
+const errorSection = {
+    backgroundColor: "#fef2f2",
+    borderLeft: "4px solid #f87171",
+    padding: "16px"
+};
+
+const errorRow = {
+    verticalAlign: "top"
+};
+
+const errorIcon = {
+    fontSize: "24px",
+    margin: "0"
+};
+
+const errorTitle = {
+    color: "#991b1b",
+    fontSize: "18px",
+    fontWeight: "600",
+    margin: "0 0 4px 0"
+};
+
+const errorMessage = {
+    color: "#b91c1c",
+    fontSize: "14px",
+    margin: "0"
+};
+
 const successRow = {
     verticalAlign: "top"
 };

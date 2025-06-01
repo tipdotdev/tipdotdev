@@ -23,8 +23,8 @@ export default async function Page() {
     });
     const user = authData?.user;
 
-    if (!user) {
-        redirect("/login");
+    if (!user || user.isAnonymous) {
+        redirect("/auth/sign-in");
     }
 
     if (!profile) {
