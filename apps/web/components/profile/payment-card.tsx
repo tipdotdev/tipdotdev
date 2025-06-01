@@ -59,13 +59,17 @@ export default function PaymentCard({
     // Calculate fees and total amount
     const platformFee = amount ? Math.round(amount * 0.045 * 100) / 100 : 0;
 
+    // Always calculate what the total would be if covering all fees (for display purposes)
+    const totalAmountWithAllFees = amount
+        ? Math.round(((amount * 1.045 + 0.3) / 0.971) * 100) / 100
+        : 0;
+
+    // Determine actual amounts based on user selection
     let totalAmount = amount;
     let estimatedStripeFee = 0;
 
     if (coverAllFees) {
-        // Calculate total needed so recipient gets full amount after all fees
-        // Formula: totalCharge = (tipAmount * 1.045 + 0.30) / 0.971
-        totalAmount = Math.round(((amount * 1.045 + 0.3) / 0.971) * 100) / 100;
+        totalAmount = totalAmountWithAllFees;
         estimatedStripeFee = Math.round((totalAmount * 0.029 + 0.3) * 100) / 100;
     } else {
         estimatedStripeFee = Math.round((amount * 0.029 + 0.3) * 100) / 100;
@@ -202,8 +206,11 @@ export default function PaymentCard({
                                                 <div className="flex-1 space-y-1">
                                                     <div className="flex flex-wrap items-center gap-2">
                                                         <p className="text-sm font-medium">
-                                                            Cover all fees (+$
-                                                            {(totalAmount - amount).toFixed(2)})
+                                                            Cover fees (+$
+                                                            {(
+                                                                totalAmountWithAllFees - amount
+                                                            ).toFixed(2)}
+                                                            )
                                                         </p>
                                                         <Dialog>
                                                             <DialogTrigger asChild>
@@ -221,10 +228,16 @@ export default function PaymentCard({
                                                                     </DialogTitle>
                                                                     <DialogDescription className="space-y-3 text-left">
                                                                         <p>
-                                                                            This option covers both
-                                                                            platform fees and
-                                                                            Stripe&apos;s processing
-                                                                            fees.
+                                                                            This option attempts to
+                                                                            cover both platform and
+                                                                            Stripe processing fees
+                                                                            so{" "}
+                                                                            <strong>
+                                                                                {username}
+                                                                            </strong>{" "}
+                                                                            receives as close to
+                                                                            your full intended tip
+                                                                            as possible.
                                                                         </p>
                                                                         <div className="space-y-2 rounded-lg bg-muted p-3">
                                                                             <div>
@@ -237,9 +250,11 @@ export default function PaymentCard({
                                                                                     {platformFee.toFixed(
                                                                                         2
                                                                                     )}{" "}
-                                                                                    - Platform
-                                                                                    maintenance and
-                                                                                    support
+                                                                                    -{" "}
+                                                                                    <strong>
+                                                                                        Completely
+                                                                                        covered
+                                                                                    </strong>
                                                                                 </p>
                                                                             </div>
                                                                             <div>
@@ -253,18 +268,42 @@ export default function PaymentCard({
                                                                                     {estimatedStripeFee.toFixed(
                                                                                         2
                                                                                     )}{" "}
-                                                                                    - Payment
-                                                                                    processing costs
+                                                                                    -{" "}
+                                                                                    <strong>
+                                                                                        Estimated
+                                                                                        coverage
+                                                                                    </strong>
                                                                                 </p>
                                                                             </div>
                                                                         </div>
+                                                                        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-950/20">
+                                                                            <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                                                                                Important Note
+                                                                            </p>
+                                                                            <p className="mt-1 text-xs text-yellow-700 dark:text-yellow-300">
+                                                                                Stripe fees vary
+                                                                                based on card type,
+                                                                                country, currency
+                                                                                conversion, and
+                                                                                other factors. While
+                                                                                we attempt to cover
+                                                                                these fees, we
+                                                                                cannot guarantee
+                                                                                100% coverage due to
+                                                                                this variability.
+                                                                            </p>
+                                                                        </div>
                                                                         <p>
+                                                                            Our 4.5% platform fee is
+                                                                            completely covered, and{" "}
                                                                             <strong>
                                                                                 {username}
                                                                             </strong>{" "}
-                                                                            will receive the full $
-                                                                            {amount} you intended to
-                                                                            tip.
+                                                                            will receive
+                                                                            approximately ${amount}{" "}
+                                                                            (potentially slightly
+                                                                            more or less depending
+                                                                            on actual Stripe fees).
                                                                         </p>
                                                                     </DialogDescription>
                                                                 </DialogHeader>
@@ -281,18 +320,6 @@ export default function PaymentCard({
                                     </FormItem>
                                 )}
                             />
-                            {coverAllFees && (
-                                <div className="rounded-md border border-green-500 bg-green-700/10 p-3">
-                                    <p className="text-sm">
-                                        <strong>Total: ${totalAmount.toFixed(2)}</strong> (includes
-                                        all fees so {username} gets ${amount})
-                                    </p>
-                                    <p className="mt-1 text-xs text-muted-foreground">
-                                        {username} will receive the full ${amount} you intended to
-                                        tip.
-                                    </p>
-                                </div>
-                            )}
                             <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
                                 {isLoading ? (
                                     "Processing..."
