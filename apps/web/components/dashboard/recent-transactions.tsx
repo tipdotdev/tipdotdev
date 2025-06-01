@@ -179,9 +179,8 @@ export default function RecentTransactionsWidget({ userId }: { userId: string })
                         {transactions.length > transactionsPerPage && (
                             <div className="mt-4 flex items-center justify-between">
                                 <div className="text-sm text-muted-foreground">
-                                    Showing {startIndex + 1} to{" "}
-                                    {Math.min(endIndex, transactions.length)} of{" "}
-                                    {transactions.length} transactions
+                                    {startIndex + 1}-{Math.min(endIndex, transactions.length)} of{" "}
+                                    {transactions.length}
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     <Button
