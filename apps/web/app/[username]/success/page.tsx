@@ -39,6 +39,7 @@ export default function SuccessPage() {
             .then((data) => {
                 if (data.error) {
                     setError(data.error);
+                    console.error(data.error);
                 }
             })
             .finally(() => {
@@ -69,7 +70,16 @@ export default function SuccessPage() {
     if (isLoading) {
         return (
             <div className="flex h-screen w-screen items-center justify-center">
-                <Spinner />
+                <div className="flex flex-col items-center justify-center gap-4">
+                    <Spinner />
+                    <p className="text-center text-sm text-foreground/80">
+                        Processing payment, please wait.
+                        <br />
+                        <strong className="text-foreground">
+                            <u>Do not close this page.</u>
+                        </strong>
+                    </p>
+                </div>
             </div>
         );
     }
