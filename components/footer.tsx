@@ -108,7 +108,7 @@ export function SmallFooter() {
                         <AnimatedLogo />
                         <p>© {new Date().getFullYear()} tip.dev. All rights reserved.</p>
                     </div>
-                    <div className="flex flex-row items-center space-x-4 text-sm text-foreground/60">
+                    <div className="flex flex-row items-center space-x-4 text-xs text-foreground/60">
                         <Link
                             href="/privacy"
                             className="transition-colors ease-in-out hover:text-foreground"

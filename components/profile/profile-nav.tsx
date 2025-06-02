@@ -25,7 +25,7 @@ export default function ProfileNav({ username }: { username: string }) {
                             <span className="font-mono">tip.dev</span>
                         </Link>
                     </div>
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-2">
                         <Button variant="outline" onClick={() => setShareOpen(true)}>
                             Share
                         </Button>
