@@ -26,10 +26,12 @@ export default function LandingPage() {
             <Testimonials />
             <CTA prelaunch={prelaunch} setFormFocused={setFormFocused} />
 
-            <p className="mb-4 text-center text-sm text-foreground/30">
-                As we are still in pre-launch, the stats and testimonials on this page are for
-                demonstration purposes only.
-            </p>
+            {prelaunch && (
+                <p className="mb-4 text-center text-sm text-foreground/30">
+                    As we are still in pre-launch, the stats and testimonials on this page are for
+                    demonstration purposes only.
+                </p>
+            )}
             <Footer />
         </div>
     );
