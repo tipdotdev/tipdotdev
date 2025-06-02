@@ -10,7 +10,9 @@
         "ui:add": "bunx shadcn@latest add",
         "email:dev": "email dev",
         "db:generate": "drizzle-kit generate",
-        "db:migrate": "drizzle-kit migrate"
+        "db:migrate": "drizzle-kit migrate",
+        "prod:copy-secrets": "fly secrets import < .env.prod",
+        "prod:deploy": "bun run prod:copy-secrets && fly deploy"
     },
     "dependencies": {
         "@aws-sdk/client-ses": "^3.821.0",
@@ -57,6 +59,7 @@
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",
+        "@flydotio/dockerfile": "^0.7.10",
         "@svgr/webpack": "^8.1.0",
         "@types/ms": "^2.1.0",
         "@types/node": "^20",
