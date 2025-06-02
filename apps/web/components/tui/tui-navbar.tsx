@@ -39,8 +39,8 @@ export default function TUINavbar({
     }, [router, disableKeyboardNavigation]);
 
     return (
-        <nav className="absolute top-0 z-50 flex w-full items-center justify-between px-4 py-2">
-            <div className="w-1/3">
+        <nav className="absolute top-0 z-50 flex w-full items-center justify-between px-4 py-2 font-mono">
+            <div className="flex w-1/3 flex-row items-center gap-2">
                 <AnimatedLogo />
             </div>
             <div className="flex w-1/3 flex-row items-center justify-center gap-2">

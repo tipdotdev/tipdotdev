@@ -76,6 +76,81 @@ export default {
     			lg: 'var(--radius)',
     			md: 'calc(var(--radius) - 2px)',
     			sm: 'calc(var(--radius) - 4px)'
+    		},
+    		keyframes: {
+    			aurora: {
+    				'0%': {
+    					backgroundPosition: '0% 50%',
+    					transform: 'rotate(-5deg) scale(0.9)'
+    				},
+    				'25%': {
+    					backgroundPosition: '50% 100%',
+    					transform: 'rotate(5deg) scale(1.1)'
+    				},
+    				'50%': {
+    					backgroundPosition: '100% 50%',
+    					transform: 'rotate(-3deg) scale(0.95)'
+    				},
+    				'75%': {
+    					backgroundPosition: '50% 0%',
+    					transform: 'rotate(3deg) scale(1.05)'
+    				},
+    				'100%': {
+    					backgroundPosition: '0% 50%',
+    					transform: 'rotate(-5deg) scale(0.9)'
+    				}
+    			},
+    			ripple: {
+    				'0%, 100%': {
+    					transform: 'translate(-50%, -50%) scale(1)'
+    				},
+    				'50%': {
+    					transform: 'translate(-50%, -50%) scale(0.9)'
+    				}
+    			},
+    			'shimmer-slide': {
+    				to: {
+    					transform: 'translate(calc(100cqw - 100%), 0)'
+    				}
+    			},
+    			'spin-around': {
+    				'0%': {
+    					transform: 'translateZ(0) rotate(0)'
+    				},
+    				'15%, 35%': {
+    					transform: 'translateZ(0) rotate(90deg)'
+    				},
+    				'65%, 85%': {
+    					transform: 'translateZ(0) rotate(270deg)'
+    				},
+    				'100%': {
+    					transform: 'translateZ(0) rotate(360deg)'
+    				}
+    			},
+    			marquee: {
+    				from: {
+    					transform: 'translateX(0)'
+    				},
+    				to: {
+    					transform: 'translateX(calc(-100% - var(--gap)))'
+    				}
+    			},
+    			'marquee-vertical': {
+    				from: {
+    					transform: 'translateY(0)'
+    				},
+    				to: {
+    					transform: 'translateY(calc(-100% - var(--gap)))'
+    				}
+    			}
+    		},
+    		animation: {
+    			aurora: 'aurora 8s ease-in-out infinite alternate',
+    			ripple: 'ripple var(--duration,2s) ease calc(var(--i, 0)*.2s) infinite',
+    			'shimmer-slide': 'shimmer-slide var(--speed) ease-in-out infinite alternate',
+    			'spin-around': 'spin-around calc(var(--speed) * 2) infinite linear',
+    			marquee: 'marquee var(--duration) infinite linear',
+    			'marquee-vertical': 'marquee-vertical var(--duration) linear infinite'
     		}
     	}
     },

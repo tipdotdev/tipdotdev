@@ -1,10 +1,11 @@
+import Footer from "@/components/footer";
 import TUINavbar from "@/components/tui/tui-navbar";
 
 export default function Page() {
     return (
         <div className="flex min-h-screen flex-col items-center justify-center font-mono font-normal">
             <TUINavbar active="about" />
-            <section className="relative mt-12 flex w-full max-w-4xl flex-col items-center justify-center px-4 py-8">
+            <section className="relative mb-12 mt-12 flex w-full max-w-4xl flex-col items-center justify-center px-4 py-8">
                 <div className="flex w-full flex-col gap-12">
                     <div className="flex w-full flex-col gap-2">
                         <h1 className="text-xl text-[#fff]">What is tip.dev?</h1>
@@ -124,6 +125,7 @@ export default function Page() {
                     </div>
                 </div>
             </section>
+            <Footer />
         </div>
     );
 }

@@ -1,34 +1,36 @@
 "use client";
 
+import Footer from "@/components/footer";
+import CTA from "@/components/landing/cta";
+import Features from "@/components/landing/features";
+import Hero from "@/components/landing/hero";
+import HowItWorks from "@/components/landing/how-it-works";
+import Pricing from "@/components/landing/pricing";
+import Stats from "@/components/landing/stats";
+import Testimonials from "@/components/landing/testimonials";
 import TUINavbar from "@/components/tui/tui-navbar";
-import WaitlistForm from "@/components/waitlist-form";
 import { useState } from "react";
 
-export default function Home() {
+export default function LandingPage() {
+    const prelaunch = true;
     const [formFocused, setFormFocused] = useState(false);
+
     return (
-        <div className="flex min-h-screen flex-col font-mono font-normal">
+        <div className="min-h-screen">
             <TUINavbar active="home" disableKeyboardNavigation={formFocused} />
-            {/* Full-height Hero Section */}
-            <section className="relative flex h-screen flex-col items-center justify-center px-4 py-8">
-                <div className="flex max-w-md flex-col gap-2">
-                    <p className="text-sm text-[#AAA]">tip.dev</p>
-                    <h1 className="text-xl text-[#fff]">Make money doing what you love</h1>
-                    <span className="mt-4 text-sm">
-                        tip.dev ({"{$}"}) is a platform for{" "}
-                        <span className="font-extrabold text-[#fff] underline">developers</span> to
-                        get paid by fans of their work. Embed a link anywhere and get paid from
-                        almost everywhere.
-                    </span>
-                </div>
+            <Hero prelaunch={prelaunch} setFormFocused={setFormFocused} />
+            <Stats />
+            <Features />
+            <HowItWorks />
+            <Pricing prelaunch={prelaunch} />
+            <Testimonials />
+            <CTA prelaunch={prelaunch} setFormFocused={setFormFocused} />
 
-                <div className="mt-8 w-full max-w-md border-t border-dashed border-border" />
-
-                <div className="mt-8 flex w-full max-w-md flex-col items-start gap-2">
-                    {/* <TUIBadge text="Coming Soon" /> */}
-                    <WaitlistForm setFormFocused={setFormFocused} />
-                </div>
-            </section>
+            <p className="mb-4 text-center text-sm text-foreground/30">
+                As we are still in pre-launch, the stats and testimonials on this page are for
+                demonstration purposes only.
+            </p>
+            <Footer />
         </div>
     );
 }
