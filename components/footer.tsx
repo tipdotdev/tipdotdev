@@ -3,7 +3,7 @@ import { AnimatedLogo } from "./tui/tui-navbar";
 
 export default function Footer() {
     return (
-        <footer className="w-screen rounded-[15%] rounded-b-none border-t border-sidebar-border bg-sidebar py-12">
+        <footer className="border-t border-sidebar-border bg-sidebar py-12">
             <div className="w-full px-4">
                 <div className="grid w-full grid-cols-1 px-8 md:grid-cols-5">
                     <div>
