@@ -42,8 +42,8 @@ export default function ProfileHeader({ profile }: { profile: Profile }) {
 
 export function Banner({ src }: { src: string | null }) {
     return (
-        <div className="relative h-48 overflow-hidden rounded-lg bg-sidebar">
-            {src && <Image src={src} alt="Banner" fill className="aspect-[4/1] object-cover" />}
+        <div className="relative aspect-[4/1] overflow-hidden rounded-lg bg-sidebar">
+            {src && <Image src={src} alt="Banner" fill className="h-full w-full object-cover" />}
         </div>
     );
 }
