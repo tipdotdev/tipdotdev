@@ -13,7 +13,7 @@ export default function Stats() {
                         delay={0.1}
                         prefix="$"
                         suffix="M+"
-                        label="Tips Processed"
+                        label="Raised for Developers"
                     />
                     <AnimatedStat end={15} delay={0.2} suffix="K+" label="Active Developers" />
                     <AnimatedStat end={50} delay={0.3} suffix="K+" label="Tips Processed" />
