@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { PaymentIntentSimple } from "@/types/stripe";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { User } from "better-auth";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -35,12 +36,14 @@ export default function PaymentCard({
     username,
     stripeAcctID,
     isSignedIn,
-    disabled
+    disabled,
+    user
 }: {
     username: string;
     stripeAcctID: string;
     isSignedIn: boolean;
     disabled: boolean;
+    user?: User | undefined;
 }) {
     const [paymentIntent, setPaymentIntent] = useState<PaymentIntentSimple | null>(null);
     const [isLoading, setIsLoading] = useState(false); // Loading state
@@ -48,7 +51,7 @@ export default function PaymentCard({
         resolver: zodResolver(formSchema),
         defaultValues: {
             amount: 5,
-            email: "",
+            email: user ? user.email : "",
             message: "",
             coverAllFees: false
         }
@@ -121,7 +124,7 @@ export default function PaymentCard({
     return (
         <>
             {disabled ? (
-                <Card className="h-fit w-full border-border/40 bg-card/40 p-4">
+                <Card className="h-fit w-full border-sidebar-border bg-sidebar p-4">
                     <CardContent className="flex h-full flex-col items-center justify-center p-0">
                         <p className="text-sm">
                             {username} is unable to receive tips at the moment.
@@ -134,7 +137,7 @@ export default function PaymentCard({
                     </CardContent>
                 </Card>
             ) : (
-                <Card className="w-full border-border/40 bg-card/40 p-4">
+                <Card className="w-full border-sidebar-border bg-sidebar p-4">
                     <CardHeader className="p-0">
                         <CardTitle className="text-foreground/60">Support {username}</CardTitle>
                     </CardHeader>
@@ -179,6 +182,35 @@ export default function PaymentCard({
                                             </FormItem>
                                         )}
                                     />
+                                    <div className="flex w-full flex-row gap-2">
+                                        <Button
+                                            variant="outline"
+                                            className="w-full bg-sidebar"
+                                            size="lg"
+                                            type="button"
+                                            onClick={() => form.setValue("amount", 5)}
+                                        >
+                                            $5
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            className="w-full bg-sidebar"
+                                            size="lg"
+                                            type="button"
+                                            onClick={() => form.setValue("amount", 10)}
+                                        >
+                                            $10
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            className="w-full bg-sidebar"
+                                            size="lg"
+                                            type="button"
+                                            onClick={() => form.setValue("amount", 25)}
+                                        >
+                                            $25
+                                        </Button>
+                                    </div>
                                     <FormField
                                         control={form.control}
                                         name="email"
@@ -189,6 +221,7 @@ export default function PaymentCard({
                                                         placeholder="Email"
                                                         {...field}
                                                         type="email"
+                                                        className="h-10"
                                                     />
                                                 </FormControl>
                                                 <FormMessage />

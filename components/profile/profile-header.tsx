@@ -1,81 +1,49 @@
-"use client";
-
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { profile as profileSchema } from "@/db/schema";
-import { ShareIcon } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Button } from "../ui/button";
 
-export function ProfileHeader({
-    profile,
-    isOwner,
-    isSignedIn
-}: {
-    profile: typeof profileSchema.$inferSelect;
-    isOwner: boolean;
-    isSignedIn: boolean;
-}) {
+type Profile = typeof profileSchema.$inferSelect;
+
+export default function ProfileHeader({ profile }: { profile: Profile }) {
     return (
-        <>
-            <Banner src={profile.bannerUrl || ""} alt={profile.username + "'s banner on tip.dev"} />
-            <div className="-mt-4 flex w-full flex-col items-start justify-center gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex items-center justify-center gap-4">
-                    <Avatar className="h-24 w-24 border-[6px] border-background">
-                        <AvatarFallback className="text-2xl">
-                            {profile.username[0].toUpperCase()}
-                        </AvatarFallback>
-                        <AvatarImage
-                            src={profile.avatarUrl || ""}
-                            alt={profile.username + "'s avatar on tip.dev"}
-                        />
-                    </Avatar>
-                    <div className="flex flex-col items-start justify-center">
-                        <p className="font-mono text-2xl">
-                            {profile.displayName || profile.username}
-                        </p>
-                        <p className="text-sm text-foreground/40">tip.dev/{profile.username}</p>
-                    </div>
-                </div>
-                <div className="flex w-full items-center justify-center gap-4 md:w-fit">
-                    <Button
-                        variant="secondary"
-                        size="lg"
-                        className="w-full md:w-fit"
-                        onClick={() => {
-                            console.log("clicked");
-                            navigator.clipboard.writeText(`https://tip.dev/${profile.username}`);
-                            toast.success("Copied to clipboard");
-                        }}
-                    >
-                        <ShareIcon />
-                        Share
-                    </Button>
-                    {isOwner ? (
-                        <Button
-                            variant="secondary"
-                            size="lg"
-                            className="w-full md:w-fit"
-                            disabled={!isSignedIn}
-                            asChild
+        <div>
+            <Banner src={profile.bannerUrl} />
+
+            {/* Profile Header */}
+            <div className="-mt-4 flex flex-row items-center">
+                <Avatar className="h-36 w-36 border-[6px] border-background">
+                    <AvatarImage src={profile.avatarUrl || undefined} />
+                    <AvatarFallback className="bg-sidebar text-2xl">
+                        {profile.displayName ? profile.displayName[0] : profile.username[0]}
+                    </AvatarFallback>
+                </Avatar>
+                <div className="ml-4 flex flex-col items-start">
+                    <h1 className="text-2xl font-bold">
+                        {profile.displayName || profile.username}
+                    </h1>
+                    <p className="font-mono text-sm text-foreground/60">@{profile.username}</p>
+                    {profile.website && (
+                        <Link
+                            className="mt-2 flex items-center text-sm text-foreground/60 underline hover:text-foreground"
+                            href={profile.website}
+                            target="_blank"
                         >
-                            <Link href="/dashboard/profile">Edit Profile</Link>
-                        </Button>
-                    ) : (
-                        <Button variant="secondary" size="lg" disabled={!isSignedIn}>
-                            Follow
-                        </Button>
+                            {profile.website.replace("https://", "")}
+                            <ExternalLink className="ml-1 h-3 w-3" />
+                        </Link>
                     )}
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 
-function Banner({ src, alt }: { src: string; alt: string }) {
+export function Banner({ src }: { src: string | null }) {
     return (
-        <div className="relative aspect-[4/1] w-full overflow-hidden rounded-lg bg-muted">
-            {src && <img src={src} alt={alt} className="h-full w-full object-cover" />}
+        <div className="relative h-48 overflow-hidden rounded-lg bg-sidebar">
+            {src && <Image src={src} alt="Banner" fill className="aspect-[4/1] object-cover" />}
         </div>
     );
 }
