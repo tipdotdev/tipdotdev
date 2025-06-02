@@ -45,7 +45,7 @@ export default function Pricing({ prelaunch }: { prelaunch?: boolean }) {
                             API access
                         </li>
                     </ul>
-                    {prelaunch && (
+                    {!prelaunch && (
                         <Button
                             className="mt-8 w-full rounded-lg bg-white px-8 py-3 font-semibold text-black transition-colors hover:bg-gray-200"
                             asChild
