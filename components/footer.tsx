@@ -98,3 +98,32 @@ export default function Footer() {
         </footer>
     );
 }
+
+export function SmallFooter() {
+    return (
+        <footer className="py-4">
+            <div className="w-full px-4">
+                <div className="flex flex-col-reverse items-center justify-between gap-2 px-8 md:flex-row">
+                    <div className="flex items-center space-x-2 font-mono text-xs text-foreground/60">
+                        <AnimatedLogo />
+                        <p>© {new Date().getFullYear()} tip.dev. All rights reserved.</p>
+                    </div>
+                    <div className="flex flex-row items-center space-x-4 text-sm text-foreground/60">
+                        <Link
+                            href="/privacy"
+                            className="transition-colors ease-in-out hover:text-foreground"
+                        >
+                            Privacy
+                        </Link>
+                        <Link
+                            href="/terms"
+                            className="transition-colors ease-in-out hover:text-foreground"
+                        >
+                            Terms
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    );
+}

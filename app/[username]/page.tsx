@@ -1,6 +1,6 @@
 import { getProfile } from "@/actions/profile";
 import { getRecentTransactions } from "@/actions/user";
-import Footer from "@/components/footer";
+import { SmallFooter } from "@/components/footer";
 import { NumberTicker } from "@/components/magicui/number-ticker";
 import PaymentCard from "@/components/profile/payment-card";
 import ProfileHeader from "@/components/profile/profile-header";
@@ -146,7 +146,7 @@ export default async function Page({ params }: Props) {
                     </div>
                 </div>
             </div>
-            <Footer />
+            <SmallFooter />
         </div>
     );
 }

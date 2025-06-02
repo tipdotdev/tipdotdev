@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -76,9 +77,9 @@ function TUILink({
     );
 }
 
-export function AnimatedLogo() {
+export function AnimatedLogo({ className }: { className?: string }) {
     return (
-        <Link className="group inline-block" href="/">
+        <Link className={cn("group inline-block", className)} href="/">
             <span className="inline-block transform transition-transform duration-300 group-hover:-translate-x-1">
                 {"{"}
             </span>
