@@ -8,6 +8,7 @@ import { authClient } from "@/lib/auth-client";
 import { PaymentIntentSimple } from "@/types/stripe";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User } from "better-auth";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -414,6 +415,23 @@ export default function PaymentCard({
                                             </>
                                         )}
                                     </Button>
+                                    <p className="text-xs text-foreground/40">
+                                        By continuing, you agree to our{" "}
+                                        <Link
+                                            href="/terms"
+                                            className="underline underline-offset-2 transition-colors hover:text-foreground"
+                                        >
+                                            Terms of Service
+                                        </Link>{" "}
+                                        and{" "}
+                                        <Link
+                                            href="/privacy"
+                                            className="underline underline-offset-2 transition-colors hover:text-foreground"
+                                        >
+                                            Privacy Policy
+                                        </Link>
+                                        .
+                                    </p>
                                 </form>
                             </Form>
                         ) : (

@@ -16,16 +16,16 @@ export default function ProfileNav({ username }: { username: string }) {
         <nav className="sticky top-0 z-20 backdrop-blur-lg">
             <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between py-2">
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center">
                         <Link
                             href="/"
-                            className="flex items-center space-x-2 transition-colors ease-in-out hover:text-foreground/80"
+                            className="flex items-center gap-2 transition-colors ease-in-out hover:text-foreground/80"
                         >
                             <AnimatedLogo />
                             <span className="font-mono">tip.dev</span>
                         </Link>
                     </div>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center">
                         <Button variant="outline" onClick={() => setShareOpen(true)}>
                             Share
                         </Button>

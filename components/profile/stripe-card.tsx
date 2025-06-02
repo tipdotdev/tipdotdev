@@ -55,10 +55,28 @@ function CheckoutForm({ amount, username }: { amount: number; username: string }
             <p className="mt-2 text-sm text-muted-foreground">
                 All transactions are securely processed by{" "}
                 <Link
-                    className="underline transition-colors hover:text-foreground"
+                    className="underline underline-offset-2 transition-colors hover:text-foreground"
                     href="https://stripe.com"
                 >
                     Stripe
+                </Link>
+                .
+            </p>
+            <br />
+            <p className="text-xs text-foreground/40">
+                By continuing, you agree to our{" "}
+                <Link
+                    href="/terms"
+                    className="underline underline-offset-2 transition-colors hover:text-foreground"
+                >
+                    Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link
+                    href="/privacy"
+                    className="underline underline-offset-2 transition-colors hover:text-foreground"
+                >
+                    Privacy Policy
                 </Link>
                 .
             </p>
