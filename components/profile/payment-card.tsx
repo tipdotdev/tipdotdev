@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { PaymentIntentSimple } from "@/types/stripe";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User } from "better-auth";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -44,7 +43,8 @@ export default function PaymentCard({
     stripeAcctID: string;
     isSignedIn: boolean;
     disabled: boolean;
-    user?: User | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    user?: any;
 }) {
     const [paymentIntent, setPaymentIntent] = useState<PaymentIntentSimple | null>(null);
     const [isLoading, setIsLoading] = useState(false); // Loading state
@@ -52,7 +52,7 @@ export default function PaymentCard({
         resolver: zodResolver(formSchema),
         defaultValues: {
             amount: 5,
-            email: user ? user.email : "",
+            email: user ? (user.isAnonymous ? "" : user.email) : "",
             message: "",
             coverAllFees: false
         }
