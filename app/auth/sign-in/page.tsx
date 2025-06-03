@@ -11,6 +11,7 @@ export default async function Page() {
     });
 
     if (session && !session.user.isAnonymous) return redirect("/dashboard");
+    const env = process.env.ENV;
 
     return (
         <div className="flex min-h-screen flex-col font-mono font-normal">
@@ -23,7 +24,7 @@ export default async function Page() {
                         account, don&apos;t worry—we will get you set up.
                     </p>
 
-                    <AuthButtons />
+                    {env === "dev" && <AuthButtons />}
 
                     <p className="mt-4 text-start text-xs text-foreground/40">
                         By continuing you agree to our{" "}
