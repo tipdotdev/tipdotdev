@@ -1,3 +1,3 @@
-# tip.dev
+# {$} tip.dev
 
 coming soon.
