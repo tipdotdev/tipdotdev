@@ -1,7 +1,7 @@
 {
     "rewrites": [
         {
-            "source": "/docs/*",
+            "source": "/docs",
             "destination": "https://docs.tip.dev/:path*"
         }
     ]
