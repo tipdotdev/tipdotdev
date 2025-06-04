@@ -27,9 +27,7 @@ export default function CTA({
                                 <Link href="/auth/sign-in">Create Your Profile</Link>
                             </Button>
                             <Button size="lg" variant="outline" asChild>
-                                <Link href="https://docs.tip.dev" target="_blank">
-                                    View Documentation
-                                </Link>
+                                <Link href="/docs">View Documentation</Link>
                             </Button>
                         </>
                     )}

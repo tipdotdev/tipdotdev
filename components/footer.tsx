@@ -37,8 +37,8 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="https://docs.tip.dev" className="hover:text-white">
-                                    API Docs
+                                <Link href="/docs" className="hover:text-white">
+                                    Documentation
                                 </Link>
                             </li>
                             <li>
