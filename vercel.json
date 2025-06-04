@@ -2,7 +2,11 @@
     "rewrites": [
         {
             "source": "/docs",
-            "destination": "https://docs.tip.dev/:path*"
+            "destination": "https://docs.tip.dev"
+        },
+        {
+            "source": "/docs/:match*",
+            "destination": "https://docs.tip.dev/:match*"
         }
     ]
 }
