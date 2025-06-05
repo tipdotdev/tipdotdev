@@ -3,6 +3,7 @@ import { AccountSettingsWidget } from "@/components/dashboard/account-settings-w
 import { BillingSettingsWidget } from "@/components/dashboard/billing-settings-widget";
 import DashboardGrid, { DashboardGridItem } from "@/components/dashboard/grid";
 import { IntegrationsWidget } from "@/components/dashboard/integrations-widget";
+import { SessionsWidget } from "@/components/dashboard/sessions-widget";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -63,6 +64,10 @@ export default async function Page() {
 
                     <DashboardGridItem className="col-span-4 md:col-span-2">
                         <IntegrationsWidget />
+                    </DashboardGridItem>
+
+                    <DashboardGridItem className="col-span-4">
+                        <SessionsWidget />
                     </DashboardGridItem>
                 </DashboardGrid>
             </section>

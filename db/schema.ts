@@ -1,4 +1,13 @@
-import { boolean, integer, jsonb, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import {
+    boolean,
+    integer,
+    jsonb,
+    pgEnum,
+    pgTable,
+    serial,
+    text,
+    timestamp
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
     id: text("id").primaryKey(),
@@ -135,6 +144,36 @@ export const notificationPreferences = pgTable("notification_preferences", {
         .$defaultFn(() => /* @__PURE__ */ new Date())
         .notNull(),
     updatedAt: timestamp("updated_at")
+        .$defaultFn(() => /* @__PURE__ */ new Date())
+        .notNull()
+});
+
+export const webhook = pgTable("webhook", {
+    id: serial("id").primaryKey(),
+    userId: text("user_id")
+        .notNull()
+        .references(() => user.id, { onDelete: "cascade" }),
+    endpointUrl: text("endpoint_url").notNull(),
+    secret: text("secret").notNull(),
+    isActive: boolean("is_active").notNull().default(true),
+    eventTypes: text("event_types").notNull().array().default([]),
+    createdAt: timestamp("created_at")
+        .$defaultFn(() => /* @__PURE__ */ new Date())
+        .notNull(),
+    updatedAt: timestamp("updated_at")
+        .$defaultFn(() => /* @__PURE__ */ new Date())
+        .notNull()
+});
+
+const statusEnum = pgEnum("status", ["success", "error", "pending"]);
+export const webhookLog = pgTable("webhook_log", {
+    id: serial("id").primaryKey(),
+    webhookId: integer("webhook_id")
+        .notNull()
+        .references(() => webhook.id, { onDelete: "cascade" }),
+    status: statusEnum("status").notNull().default("pending"),
+    response: jsonb("response"),
+    createdAt: timestamp("created_at")
         .$defaultFn(() => /* @__PURE__ */ new Date())
         .notNull()
 });
