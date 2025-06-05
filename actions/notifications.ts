@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { notificationPreferences } from "@/db/schema";
+import { op } from "@/utils/op";
 import { getUserByEmail } from "./user";
 
 export async function createNotificationPreferences(userId: string) {
@@ -23,6 +24,10 @@ export async function createNotificationPreferences(userId: string) {
             // emailOnTip is true by default
         })
         .returning();
+
+    op.track("notifications.preferences.created", {
+        profileId: userId
+    });
 
     return newPreferences[0];
 }
@@ -69,6 +74,10 @@ export async function updateNotificationPreferences(
         .set(preferences)
         .where(eq(notificationPreferences.userId, userId))
         .returning();
+
+    op.track("notifications.preferences.updated", {
+        profileId: userId
+    });
 
     return updatedPreferences[0];
 }
