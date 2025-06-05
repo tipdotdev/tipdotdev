@@ -6,6 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { PaymentIntentSimple } from "@/types/stripe";
+import { op } from "@/utils/op";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -87,6 +88,7 @@ export default function PaymentCard({
             authClient.signIn
                 .anonymous()
                 .then(() => {
+                    op.track("profile.tip.anonymous_sign_in");
                     console.log("Anonymous sign in successful");
                 })
                 .catch((error) => {
@@ -109,6 +111,12 @@ export default function PaymentCard({
                 originalAmount: values.amount.toString(),
                 platformFee: platformFee.toString(),
                 estimatedStripeFee: estimatedStripeFee.toString()
+            });
+            op.track("profile.tip.created", {
+                profileId: user.id,
+                amount: totalAmount,
+                type: "tip",
+                stripeId: pi.id
             });
             setPaymentIntent(pi as PaymentIntentSimple);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

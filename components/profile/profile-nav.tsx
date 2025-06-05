@@ -1,5 +1,6 @@
 "use client";
 
+import { op } from "@/utils/op";
 import { Copy, Facebook, MessageCircle, Share2, Twitter } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -53,6 +54,9 @@ function ShareModal({
 
     const copyToClipboard = async () => {
         try {
+            op.track("profile.share.copied_url", {
+                username
+            });
             await navigator.clipboard.writeText(profileUrl);
             toast.success("Profile link copied to clipboard!");
         } catch {
@@ -61,23 +65,35 @@ function ShareModal({
     };
 
     const shareOnTwitter = () => {
+        op.track("profile.share.twitter", {
+            username
+        });
         const text = `Check out ${username}'s profile on tip.dev!`;
         const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(profileUrl)}`;
         window.open(url, "_blank");
     };
 
     const shareOnFacebook = () => {
+        op.track("profile.share.facebook", {
+            username
+        });
         const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(profileUrl)}`;
         window.open(url, "_blank");
     };
 
     const shareOnWhatsApp = () => {
+        op.track("profile.share.whatsapp", {
+            username
+        });
         const text = `Check out ${username}'s profile on tip.dev: ${profileUrl}`;
         const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
         window.open(url, "_blank");
     };
 
     const shareNative = async () => {
+        op.track("profile.share.native", {
+            username
+        });
         if (typeof navigator !== "undefined" && navigator.share) {
             try {
                 await navigator.share({

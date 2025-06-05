@@ -1,5 +1,6 @@
 "use client";
 
+import { op } from "@/utils/op";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
 import Link from "next/link";
@@ -34,6 +35,11 @@ function CheckoutForm({ amount, username }: { amount: number; username: string }
                     description: error.message || "Please try again."
                 });
             }
+
+            op.track("profile.tip.submitted", {
+                amount: amount,
+                type: "tip"
+            });
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             toast.error("Payment failed", {
