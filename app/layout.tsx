@@ -65,6 +65,7 @@ export default async function RootLayout({
                     trackOutgoingLinks={true}
                     profileId={authData?.user.id ?? undefined}
                     clientSecret={process.env.OPENPANEL_CLIENT_SECRET!}
+                    apiUrl="/api/op"
                 />
                 {children}
                 <Toaster richColors />
