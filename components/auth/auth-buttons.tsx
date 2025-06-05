@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 import GitHubLogo from "@/public/icons/github.svg";
+import { op } from "@/utils/op";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MailIcon } from "lucide-react";
 import Image from "next/image";
@@ -47,6 +48,9 @@ export default function AuthButtons() {
         if (provider === "email") {
             setEmailSelected(true);
         } else {
+            op.track("auth.sign_in.social", {
+                provider
+            });
             await authClient.signIn.social({
                 provider,
                 callbackURL: "/dashboard"
@@ -57,11 +61,15 @@ export default function AuthButtons() {
 
     async function onEmailSubmit(values: z.infer<typeof emailFormSchema>) {
         setLoading(true);
+        op.track("auth.sign_in.email");
         const { error } = await authClient.signIn.magicLink({
             email: values.email,
             callbackURL: "/dashboard"
         });
         if (error) {
+            op.track("error.auth.sign_in.email", {
+                error: error.message
+            });
             toast.error("Something went wrong", {
                 description: error.message
             });
@@ -79,6 +87,9 @@ export default function AuthButtons() {
             }
         });
         if (error) {
+            op.track("error.auth.sign_in.token", {
+                error: error.message
+            });
             toast.error("Invalid token", {
                 description: error.message
             });

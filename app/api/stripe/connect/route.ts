@@ -2,6 +2,7 @@ import { getProfileByUserId } from "@/actions/profile";
 import { getSelfUser } from "@/actions/user";
 import { db } from "@/db";
 import { profile } from "@/db/schema";
+import { op } from "@/utils/op";
 import { eq } from "drizzle-orm";
 import { Stripe } from "stripe";
 
@@ -66,6 +67,11 @@ export async function POST() {
             refresh_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/settings/payout`,
             return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`,
             type: "account_onboarding"
+        });
+
+        op.track("stripe.account.created", {
+            profileId: user.id,
+            stripeId: stripeAccount.id
         });
 
         return new Response(JSON.stringify({ account_link_url: accountLink.url }), {
