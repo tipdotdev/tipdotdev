@@ -3,6 +3,7 @@
 import { db } from "@/db";
 import { transaction } from "@/db/schema";
 import { PaymentIntentSimple } from "@/types/stripe";
+import { op } from "@/utils/op";
 import { eq } from "drizzle-orm";
 import { Stripe } from "stripe";
 import { getProfileByStripeAcctID, getProfileByUserId } from "./profile";
@@ -89,6 +90,13 @@ export async function createPaymentIntent(
         throw new Error("Error creating transaction");
     }
 
+    op.track("stripe.payment_intent.created", {
+        profileId: selfUser.id,
+        amount: finalAmount,
+        type: "tip",
+        stripeId: pi.id
+    });
+
     // Return only the necessary data
     return {
         client_secret: pi.client_secret!,
@@ -171,6 +179,13 @@ export async function completeTransaction(transactionId: string): Promise<{
         });
         const pm = await stripe.paymentMethods.retrieve(p.payment_method?.toString() || "", {
             stripeAccount: profile?.stripeAcctID || undefined
+        });
+
+        op.track("stripe.transaction.completed", {
+            profileId: updatedTransaction.fromUserId || undefined,
+            amount: updatedTransaction.amount,
+            type: "tip",
+            stripeId: transactionId
         });
 
         return {
