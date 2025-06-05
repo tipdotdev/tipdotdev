@@ -3,6 +3,7 @@
 import { user as userSchema } from "@/db/schema";
 import { authClient } from "@/lib/auth-client";
 import GitHubLogo from "@/public/icons/github.svg";
+import { op } from "@/utils/op";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InferSelectModel } from "drizzle-orm";
 import { KeyIcon, LinkIcon, MailIcon, TrashIcon } from "lucide-react";
@@ -193,6 +194,14 @@ export function AccountSettingsWidget({
                                                             });
 
                                                         if (error) {
+                                                            op.track(
+                                                                "error.dashboard.account.disconnected",
+                                                                {
+                                                                    profileId: user.id,
+                                                                    provider: account.provider,
+                                                                    error: error.message
+                                                                }
+                                                            );
                                                             toast.error(
                                                                 "Failed to disconnect account",
                                                                 {
@@ -202,6 +211,13 @@ export function AccountSettingsWidget({
                                                                 }
                                                             );
                                                         } else {
+                                                            op.track(
+                                                                "dashboard.account.disconnected",
+                                                                {
+                                                                    profileId: user.id,
+                                                                    provider: account.provider
+                                                                }
+                                                            );
                                                             toast.success("Account disconnected");
                                                             setConnectedAccounts((prev) =>
                                                                 prev.map((acc) =>
@@ -236,11 +252,23 @@ export function AccountSettingsWidget({
                                                     });
 
                                                     if (error) {
+                                                        op.track(
+                                                            "error.dashboard.account.connected",
+                                                            {
+                                                                profileId: user.id,
+                                                                provider: account.provider,
+                                                                error: error.message
+                                                            }
+                                                        );
                                                         toast.error("Failed to connect account", {
                                                             description:
                                                                 error.message ?? "Unknown error"
                                                         });
                                                     } else {
+                                                        op.track("dashboard.account.connected", {
+                                                            profileId: user.id,
+                                                            provider: account.provider
+                                                        });
                                                         toast.success("Account connected");
                                                         setConnectedAccounts((prev) =>
                                                             prev.map((acc) =>
@@ -317,7 +345,12 @@ export function AccountSettingsWidget({
                                 variant="destructive"
                                 size="sm"
                                 className="border-red-600 bg-red-600 hover:bg-red-700"
-                                onClick={() => setIsDeleteModalOpen(true)}
+                                onClick={() => {
+                                    op.track("dashboard.account.delete_account_clicked", {
+                                        profileId: user.id
+                                    });
+                                    setIsDeleteModalOpen(true);
+                                }}
                             >
                                 Delete
                             </Button>

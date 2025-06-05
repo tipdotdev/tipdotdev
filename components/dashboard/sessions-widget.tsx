@@ -1,6 +1,7 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
+import { op } from "@/utils/op";
 import type { Session as SessionType } from "better-auth";
 import { Calendar, Globe, Monitor, Shield, Smartphone, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -33,6 +34,9 @@ export function SessionsWidget() {
 
     const handleRevokeSession = async (sessionId: string) => {
         try {
+            op.track("dashboard.sessions.revoked", {
+                sessionId
+            });
             await authClient.revokeSession({ token: sessionId });
             setSessions((prev) => prev.filter((session) => session.id !== sessionId));
             toast.success("Session revoked successfully");
@@ -48,6 +52,7 @@ export function SessionsWidget() {
             // Refresh sessions list
             const updatedSessions = await authClient.listSessions();
             setSessions(updatedSessions.data ?? []);
+            op.track("dashboard.sessions.revoked_other");
             toast.success("Other sessions revoked successfully");
         } catch (error) {
             console.error("Failed to revoke other sessions:", error);

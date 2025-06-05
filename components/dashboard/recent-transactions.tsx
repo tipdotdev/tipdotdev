@@ -3,6 +3,7 @@
 
 import { getStripeDashboardLink } from "@/actions/stripe";
 import { transaction } from "@/db/schema";
+import { op } from "@/utils/op";
 import { InferSelectModel } from "drizzle-orm";
 import { ChevronLeft, ChevronRight, Copy, ExternalLink } from "lucide-react";
 import Link from "next/link";
@@ -80,6 +81,10 @@ export default function RecentTransactionsWidget({
     };
 
     const handleRowClick = (transactionData: InferSelectModel<typeof transaction>) => {
+        op.track("dashboard.transaction.details_viewed", {
+            profileId: userId,
+            transactionId: transactionData.id
+        });
         setSelectedTransaction(transactionData);
         setIsModalOpen(true);
     };
