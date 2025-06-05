@@ -2,6 +2,7 @@
 
 import { db } from "@/db";
 import { waitlist } from "@/db/schema";
+import { op } from "@/utils/op";
 import { count } from "drizzle-orm";
 
 export async function addToWaitlist(email: string): Promise<{
@@ -23,6 +24,10 @@ export async function addToWaitlist(email: string): Promise<{
             error: "You're already on the waitlist"
         };
     }
+
+    op.track("waitlist.added", {
+        email: email
+    });
 
     return {
         success: true
