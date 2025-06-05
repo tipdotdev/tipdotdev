@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { profile } from "@/db/schema";
 import { deleteUploadThingFile } from "@/lib/uploadthing";
 import { auth } from "@/utils/auth";
+import { op } from "@/utils/op";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { createNotificationPreferences, updateNotificationPreferences } from "./notifications";
@@ -62,6 +63,10 @@ export async function insertUsername(username: string) {
         console.error("Error setting username:", error);
         throw new Error("Error setting username");
     }
+
+    op.track("profile.created", {
+        profileId: session.user.id
+    });
 
     // create the notification preferences
     await createNotificationPreferences(session.user.id);
@@ -137,6 +142,10 @@ export async function updateProfilePersonalInfo(
         throw new Error("Error updating profile");
     }
 
+    op.track("profile.updated.personal_info", {
+        profileId: userId
+    });
+
     return { success: true, error: null };
 }
 
@@ -171,6 +180,10 @@ export async function updateProfileSocialMedia(
         console.error("Error updating profile social media:", error);
         throw new Error("Error updating profile social media");
     }
+
+    op.track("profile.updated.social_media", {
+        profileId: userId
+    });
 
     return { success: true, error: null };
 }
@@ -213,6 +226,10 @@ export async function updateProfileSettings(
             console.error("Error updating notification preferences");
             throw new Error("Error updating notification preferences");
         }
+
+        op.track("profile.updated.settings", {
+            profileId: userId
+        });
 
         return { success: true, error: null };
     } catch (error) {
@@ -267,6 +284,10 @@ export async function updateProfileAvatar(
             throw new Error("Error updating profile avatar");
         }
 
+        op.track("profile.updated.avatar", {
+            profileId: userId
+        });
+
         return { success: true, error: null };
     } catch (error) {
         console.error("Error updating profile avatar:", error);
@@ -319,6 +340,10 @@ export async function updateProfileBanner(
             console.error("Error updating profile banner:", error);
             throw new Error("Error updating profile banner");
         }
+
+        op.track("profile.updated.banner", {
+            profileId: userId
+        });
 
         return { success: true, error: null };
     } catch (error) {
