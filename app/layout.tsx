@@ -1,3 +1,4 @@
+import { PosthogProvider } from "@/components/posthog-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "@/styles/globals.css";
 import type { Metadata } from "next";
@@ -52,7 +53,7 @@ export default async function RootLayout({
                     (fontSans.variable, fontSerif.variable)
                 }`}
             >
-                {children}
+                <PosthogProvider>{children}</PosthogProvider>
                 <Toaster richColors />
             </body>
         </html>

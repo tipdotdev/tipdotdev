@@ -8,5 +8,6 @@ export default async function Page() {
         headers: await headers()
     });
     posthog.capture("auth.signed_out");
+    posthog.reset();
     return redirect("/auth/sign-in");
 }
