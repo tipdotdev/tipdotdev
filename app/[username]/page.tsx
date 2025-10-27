@@ -185,6 +185,10 @@ function Social({
     url: string;
 }) {
     const className = "size-5";
+
+    if (url === "") return null;
+    if (url === null) return null;
+
     return (
         <Link
             href={url}
