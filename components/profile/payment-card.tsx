@@ -6,9 +6,9 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { PaymentIntentSimple } from "@/types/stripe";
-import { op } from "@/utils/op";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import posthog from "posthog-js";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -88,7 +88,7 @@ export default function PaymentCard({
             authClient.signIn
                 .anonymous()
                 .then(() => {
-                    op.track("profile.tip.anonymous_sign_in");
+                    posthog.capture("profile.tip.anonymous_sign_in");
                     console.log("Anonymous sign in successful");
                 })
                 .catch((error) => {
@@ -112,7 +112,7 @@ export default function PaymentCard({
                 platformFee: platformFee.toString(),
                 estimatedStripeFee: estimatedStripeFee.toString()
             });
-            op.track("profile.tip.created", {
+            posthog.capture("profile.tip.created", {
                 profileId: user.id,
                 amount: totalAmount,
                 type: "tip",

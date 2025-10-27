@@ -3,11 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 import GitHubLogo from "@/public/icons/github.svg";
-import { op } from "@/utils/op";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MailIcon } from "lucide-react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
+import posthog from "posthog-js";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -48,7 +48,7 @@ export default function AuthButtons() {
         if (provider === "email") {
             setEmailSelected(true);
         } else {
-            op.track("auth.sign_in.social", {
+            posthog.capture("auth.sign_in.social", {
                 provider
             });
             await authClient.signIn.social({
@@ -61,13 +61,13 @@ export default function AuthButtons() {
 
     async function onEmailSubmit(values: z.infer<typeof emailFormSchema>) {
         setLoading(true);
-        op.track("auth.sign_in.email");
+        posthog.capture("auth.sign_in.email");
         const { error } = await authClient.signIn.magicLink({
             email: values.email,
             callbackURL: "/dashboard"
         });
         if (error) {
-            op.track("error.auth.sign_in.email", {
+            posthog.capture("error.auth.sign_in.email", {
                 error: error.message
             });
             toast.error("Something went wrong", {
@@ -87,7 +87,7 @@ export default function AuthButtons() {
             }
         });
         if (error) {
-            op.track("error.auth.sign_in.token", {
+            posthog.capture("error.auth.sign_in.token", {
                 error: error.message
             });
             toast.error("Invalid token", {

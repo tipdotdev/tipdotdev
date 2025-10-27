@@ -3,8 +3,8 @@
 import { db } from "@/db";
 import { transaction } from "@/db/schema";
 import { PaymentIntentSimple } from "@/types/stripe";
-import { op } from "@/utils/op";
 import { eq } from "drizzle-orm";
+import posthog from "posthog-js";
 import { Stripe } from "stripe";
 import { getProfileByStripeAcctID, getProfileByUserId } from "./profile";
 import { getSelfUser } from "./user";
@@ -90,7 +90,7 @@ export async function createPaymentIntent(
         throw new Error("Error creating transaction");
     }
 
-    op.track("stripe.payment_intent.created", {
+    posthog.capture("stripe.payment_intent.created", {
         profileId: selfUser.id,
         amount: finalAmount,
         type: "tip",
@@ -181,7 +181,7 @@ export async function completeTransaction(transactionId: string): Promise<{
             stripeAccount: profile?.stripeAcctID || undefined
         });
 
-        op.track("stripe.transaction.completed", {
+        posthog.capture("stripe.transaction.completed", {
             profileId: updatedTransaction.fromUserId || undefined,
             amount: updatedTransaction.amount,
             type: "tip",

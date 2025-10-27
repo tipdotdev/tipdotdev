@@ -4,9 +4,9 @@ import { db } from "@/db";
 import { profile } from "@/db/schema";
 import { deleteUploadThingFile } from "@/lib/uploadthing";
 import { auth } from "@/utils/auth";
-import { op } from "@/utils/op";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
+import posthog from "posthog-js";
 import { createNotificationPreferences, updateNotificationPreferences } from "./notifications";
 
 export async function checkUsernameAvailability(username: string): Promise<boolean> {
@@ -64,7 +64,7 @@ export async function insertUsername(username: string) {
         throw new Error("Error setting username");
     }
 
-    op.track("profile.created", {
+    posthog.capture("profile.created", {
         profileId: session.user.id
     });
 
@@ -142,7 +142,7 @@ export async function updateProfilePersonalInfo(
         throw new Error("Error updating profile");
     }
 
-    op.track("profile.updated.personal_info", {
+    posthog.capture("profile.updated.personal_info", {
         profileId: userId
     });
 
@@ -181,7 +181,7 @@ export async function updateProfileSocialMedia(
         throw new Error("Error updating profile social media");
     }
 
-    op.track("profile.updated.social_media", {
+    posthog.capture("profile.updated.social_media", {
         profileId: userId
     });
 
@@ -227,7 +227,7 @@ export async function updateProfileSettings(
             throw new Error("Error updating notification preferences");
         }
 
-        op.track("profile.updated.settings", {
+        posthog.capture("profile.updated.settings", {
             profileId: userId
         });
 
@@ -284,7 +284,7 @@ export async function updateProfileAvatar(
             throw new Error("Error updating profile avatar");
         }
 
-        op.track("profile.updated.avatar", {
+        posthog.capture("profile.updated.avatar", {
             profileId: userId
         });
 
@@ -341,7 +341,7 @@ export async function updateProfileBanner(
             throw new Error("Error updating profile banner");
         }
 
-        op.track("profile.updated.banner", {
+        posthog.capture("profile.updated.banner", {
             profileId: userId
         });
 

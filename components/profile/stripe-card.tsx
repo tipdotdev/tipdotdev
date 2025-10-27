@@ -1,9 +1,9 @@
 "use client";
 
-import { op } from "@/utils/op";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
 import Link from "next/link";
+import posthog from "posthog-js";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
@@ -36,7 +36,7 @@ function CheckoutForm({ amount, username }: { amount: number; username: string }
                 });
             }
 
-            op.track("profile.tip.submitted", {
+            posthog.capture("profile.tip.submitted", {
                 amount: amount,
                 type: "tip"
             });
@@ -44,6 +44,11 @@ function CheckoutForm({ amount, username }: { amount: number; username: string }
         } catch (err: any) {
             toast.error("Payment failed", {
                 description: err.message || "An unexpected error occurred. Please try again."
+            });
+            posthog.capture("error.profile.tip.submitted", {
+                amount: amount,
+                type: "tip",
+                error: err
             });
         } finally {
             setIsProcessing(false);

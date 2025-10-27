@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { notificationPreferences } from "@/db/schema";
-import { op } from "@/utils/op";
+import posthog from "posthog-js";
 import { getUserByEmail } from "./user";
 
 export async function createNotificationPreferences(userId: string) {
@@ -25,7 +25,7 @@ export async function createNotificationPreferences(userId: string) {
         })
         .returning();
 
-    op.track("notifications.preferences.created", {
+    posthog.capture("notifications.preferences.created", {
         profileId: userId
     });
 
@@ -75,7 +75,7 @@ export async function updateNotificationPreferences(
         .where(eq(notificationPreferences.userId, userId))
         .returning();
 
-    op.track("notifications.preferences.updated", {
+    posthog.capture("notifications.preferences.updated", {
         profileId: userId
     });
 

@@ -3,9 +3,9 @@
 import { db } from "@/db";
 import { transaction, user } from "@/db/schema";
 import { auth } from "@/utils/auth";
-import { op } from "@/utils/op";
 import { and, count, desc, eq, gte, sql } from "drizzle-orm";
 import { headers } from "next/headers";
+import posthog from "posthog-js";
 
 export async function getSelfUser() {
     const authData = await auth.api.getSession({
@@ -55,7 +55,7 @@ export async function getRecentTransactions(userId: string, timePeriod: string) 
         .where(and(...whereConditions))
         .orderBy(desc(transaction.createdAt));
 
-    op.track("transactions.recent", {
+    posthog.capture("transactions.recent", {
         profileId: userId,
         count: transactions.length
     });

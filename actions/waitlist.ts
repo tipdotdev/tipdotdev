@@ -2,8 +2,8 @@
 
 import { db } from "@/db";
 import { waitlist } from "@/db/schema";
-import { op } from "@/utils/op";
 import { count } from "drizzle-orm";
+import posthog from "posthog-js";
 
 export async function addToWaitlist(email: string): Promise<{
     success: boolean;
@@ -25,7 +25,7 @@ export async function addToWaitlist(email: string): Promise<{
         };
     }
 
-    op.track("waitlist.added", {
+    posthog.capture("waitlist.added", {
         email: email
     });
 

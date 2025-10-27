@@ -3,11 +3,11 @@
 import { user as userSchema } from "@/db/schema";
 import { authClient } from "@/lib/auth-client";
 import GitHubLogo from "@/public/icons/github.svg";
-import { op } from "@/utils/op";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InferSelectModel } from "drizzle-orm";
 import { KeyIcon, LinkIcon, MailIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
+import posthog from "posthog-js";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -194,7 +194,7 @@ export function AccountSettingsWidget({
                                                             });
 
                                                         if (error) {
-                                                            op.track(
+                                                            posthog.capture(
                                                                 "error.dashboard.account.disconnected",
                                                                 {
                                                                     profileId: user.id,
@@ -211,7 +211,7 @@ export function AccountSettingsWidget({
                                                                 }
                                                             );
                                                         } else {
-                                                            op.track(
+                                                            posthog.capture(
                                                                 "dashboard.account.disconnected",
                                                                 {
                                                                     profileId: user.id,
@@ -252,7 +252,7 @@ export function AccountSettingsWidget({
                                                     });
 
                                                     if (error) {
-                                                        op.track(
+                                                        posthog.capture(
                                                             "error.dashboard.account.connected",
                                                             {
                                                                 profileId: user.id,
@@ -265,10 +265,13 @@ export function AccountSettingsWidget({
                                                                 error.message ?? "Unknown error"
                                                         });
                                                     } else {
-                                                        op.track("dashboard.account.connected", {
-                                                            profileId: user.id,
-                                                            provider: account.provider
-                                                        });
+                                                        posthog.capture(
+                                                            "dashboard.account.connected",
+                                                            {
+                                                                profileId: user.id,
+                                                                provider: account.provider
+                                                            }
+                                                        );
                                                         toast.success("Account connected");
                                                         setConnectedAccounts((prev) =>
                                                             prev.map((acc) =>
@@ -346,7 +349,7 @@ export function AccountSettingsWidget({
                                 size="sm"
                                 className="border-red-600 bg-red-600 hover:bg-red-700"
                                 onClick={() => {
-                                    op.track("dashboard.account.delete_account_clicked", {
+                                    posthog.capture("dashboard.account.delete_account_clicked", {
                                         profileId: user.id
                                     });
                                     setIsDeleteModalOpen(true);

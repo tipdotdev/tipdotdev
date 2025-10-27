@@ -1,15 +1,15 @@
 "use client";
 
-import { op } from "@/utils/op";
 import { CopyIcon } from "lucide-react";
 import ms from "ms";
+import posthog from "posthog-js";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function WelcomeBack({ profile, user }: { profile: any; user: any }) {
     const copyToClipboard = (text: string) => {
-        op.track("dashboard.profile.copied_url", {
+        posthog.capture("dashboard.profile.copied_url", {
             profileId: user.id
         });
         navigator.clipboard.writeText(text);

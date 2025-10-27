@@ -2,8 +2,8 @@ import { getProfileByUserId } from "@/actions/profile";
 import { getSelfUser } from "@/actions/user";
 import { db } from "@/db";
 import { profile } from "@/db/schema";
-import { op } from "@/utils/op";
 import { eq } from "drizzle-orm";
+import posthog from "posthog-js";
 import { Stripe } from "stripe";
 
 export async function POST() {
@@ -69,7 +69,7 @@ export async function POST() {
             type: "account_onboarding"
         });
 
-        op.track("stripe.account.created", {
+        posthog.capture("stripe.account.created", {
             profileId: user.id,
             stripeId: stripeAccount.id
         });

@@ -1,12 +1,12 @@
 import { auth } from "@/utils/auth";
-import { op } from "@/utils/op";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import posthog from "posthog-js";
 
 export default async function Page() {
-    op.clear();
     await auth.api.signOut({
         headers: await headers()
     });
+    posthog.capture("auth.signed_out");
     return redirect("/auth/sign-in");
 }

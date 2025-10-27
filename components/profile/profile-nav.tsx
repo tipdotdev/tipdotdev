@@ -1,8 +1,8 @@
 "use client";
 
-import { op } from "@/utils/op";
 import { Copy, Facebook, MessageCircle, Share2, Twitter } from "lucide-react";
 import Link from "next/link";
+import posthog from "posthog-js";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AnimatedLogo } from "../tui/tui-navbar";
@@ -54,7 +54,7 @@ function ShareModal({
 
     const copyToClipboard = async () => {
         try {
-            op.track("profile.share.copied_url", {
+            posthog.capture("profile.share.copied_url", {
                 username
             });
             await navigator.clipboard.writeText(profileUrl);
@@ -65,7 +65,7 @@ function ShareModal({
     };
 
     const shareOnTwitter = () => {
-        op.track("profile.share.twitter", {
+        posthog.capture("profile.share.twitter", {
             username
         });
         const text = `Check out ${username}'s profile on tip.dev!`;
@@ -74,7 +74,7 @@ function ShareModal({
     };
 
     const shareOnFacebook = () => {
-        op.track("profile.share.facebook", {
+        posthog.capture("profile.share.facebook", {
             username
         });
         const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(profileUrl)}`;
@@ -82,7 +82,7 @@ function ShareModal({
     };
 
     const shareOnWhatsApp = () => {
-        op.track("profile.share.whatsapp", {
+        posthog.capture("profile.share.whatsapp", {
             username
         });
         const text = `Check out ${username}'s profile on tip.dev: ${profileUrl}`;
@@ -91,7 +91,7 @@ function ShareModal({
     };
 
     const shareNative = async () => {
-        op.track("profile.share.native", {
+        posthog.capture("profile.share.native", {
             username
         });
         if (typeof navigator !== "undefined" && navigator.share) {

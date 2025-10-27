@@ -3,10 +3,10 @@
 
 import { getStripeDashboardLink } from "@/actions/stripe";
 import { transaction } from "@/db/schema";
-import { op } from "@/utils/op";
 import { InferSelectModel } from "drizzle-orm";
 import { ChevronLeft, ChevronRight, Copy, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import posthog from "posthog-js";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "../ui/badge";
@@ -81,7 +81,7 @@ export default function RecentTransactionsWidget({
     };
 
     const handleRowClick = (transactionData: InferSelectModel<typeof transaction>) => {
-        op.track("dashboard.transaction.details_viewed", {
+        posthog.capture("dashboard.transaction.details_viewed", {
             profileId: userId,
             transactionId: transactionData.id
         });
