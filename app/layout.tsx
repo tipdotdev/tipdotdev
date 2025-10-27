@@ -1,10 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import "@/styles/globals.css";
-import { auth } from "@/utils/auth";
-import { OpenPanelComponent } from "@openpanel/nextjs";
 import type { Metadata } from "next";
 import { Geist as FontSans, Nunito as FontSerif } from "next/font/google";
-import { headers } from "next/headers";
 
 const fontSans = FontSans({
     subsets: ["latin"],
@@ -45,9 +42,6 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const authData = await auth.api.getSession({
-        headers: await headers()
-    });
     return (
         <html lang="en">
             <head>
@@ -58,15 +52,6 @@ export default async function RootLayout({
                     (fontSans.variable, fontSerif.variable)
                 }`}
             >
-                <OpenPanelComponent
-                    clientId={process.env.OPENPANEL_CLIENT_ID!}
-                    trackScreenViews={true}
-                    trackAttributes={true}
-                    trackOutgoingLinks={true}
-                    profileId={authData?.user.id ?? undefined}
-                    clientSecret={process.env.OPENPANEL_CLIENT_SECRET!}
-                    apiUrl="/api/op"
-                />
                 {children}
                 <Toaster richColors />
             </body>

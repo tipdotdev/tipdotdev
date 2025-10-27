@@ -31,9 +31,10 @@ export default async function Page() {
         redirect("/onboarding/username");
     }
 
-    const accounts = await auth.api.listUserAccounts({
+    const rawAccounts = await auth.api.listUserAccounts({
         headers: await headers()
     });
+    const accounts = rawAccounts.map((a) => ({ ...a, provider: a.providerId }));
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center font-normal">
